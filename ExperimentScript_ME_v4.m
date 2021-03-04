@@ -398,26 +398,6 @@ for i=order_experiment; %Either [1,2] or [2,1] -> determines the order of the ta
                     DrawFormattedText(window, ['Your answer: ' letters_handnonautotest(r).reported_G '\n Press any key to continue.'],'center','center', white);
                     vbl = Screen('Flip', window);
                     KbStrokeWait; %wait for response to terminate instruction
-                    % Show if the reported number of Gs is correct
-                    if str2num(letters_handnonautotest(r).reported_G)==sum(strcmp(letters_handnonautotest(r).presented, 'G'))
-                        DrawFormattedText(window, ['This is correct. \n Press any key to continue.' ],'center','center', white);
-                        vbl = Screen('Flip', window);
-                    else
-                        DrawFormattedText(window, ['This is incorrect. \n Press any key to continue.' ],'center','center', white);
-                        vbl = Screen('Flip', window);
-                    end
-                    KbStrokeWait;
-                    % Show if the tempo was correct. ! reflect if you want to show
-                    % this, because we cannot show this result for the foot stomping
-                    margin=0.1; % margin of error: think about what is most convenient
-                    if all(abs(diff(presses_handnonautotest(r).secs)-1/1.5)<margin)
-                        DrawFormattedText(window, ['Your tempo was ok. \n Press any key to continue.' ],'center','center', white);
-                        vbl = Screen('Flip', window);
-                    else
-                        DrawFormattedText(window, ['Your tempo was not ok. \n Press any key to continue.' ],'center','center', white);
-                        vbl = Screen('Flip', window);
-                    end
-                    KbStrokeWait;
                     DrawFormattedText(window, 'Press any key to continue with the next trail. \n Note that you will first start with a fixation cross again. \n Start tapping the sequence as soon as a letter on the screen appears.' ,'center','center', white);
                     vbl = Screen('Flip', window);
                     KbStrokeWait;
@@ -555,15 +535,6 @@ for i=order_experiment; %Either [1,2] or [2,1] -> determines the order of the ta
                     DrawFormattedText(window, ['Your answer: ' letters_footnonautotest(r).reported_G '\n Press any key to continue.'],'center','center', white);
                     vbl = Screen('Flip', window);
                     KbStrokeWait; %wait for response to terminate instruction
-                    % Show if the reported number of Gs is correct
-                    if str2num(letters_footnonautotest(r).reported_G)==sum(strcmp(letters_footnonautotest(r).presented, 'G'))
-                        DrawFormattedText(window, ['This is correct. \n Press any key to continue.' ],'center','center', white);
-                        vbl = Screen('Flip', window);
-                    else
-                        DrawFormattedText(window, ['This is incorrect. \n Press any key to continue.' ],'center','center', white);
-                        vbl = Screen('Flip', window);
-                    end
-                    KbStrokeWait;
                     DrawFormattedText(window, 'Press any key to continue with the next trail. \n Note that you will first start with a fixation cross again. \n Start tapping the sequence as soon as a letter on the screen appears.' ,'center','center', white);
                     vbl = Screen('Flip', window);
                     KbStrokeWait;
@@ -707,6 +678,53 @@ end
 % Save data for each task and experiment
 save('presses_handauto.mat', 'presses_handauto');
 save('presses_handnonauto.mat', 'presses_handnonauto');
+
+%Show dual task performance on screen ((Non)-Automaticitytest finger tapping)
+for h = 1:N_trials
+     if str2num(letters_handnonautotest(h).reported_G)==sum(strcmp(letters_handnonautotest(h).presented, 'G'))
+      fprintf('FT nonautotest: G correct \n')
+     else
+      fprintf('FT nonautotest: G incorrect \n')
+     end 
+      %Show if the tempo was correct. ! reflect if you want to show
+      %this, because we cannot show this result for the foot stomping
+      margin=0.1; % margin of error: think about what is most convenient
+      if (all(abs(diff(presses_handnonautotest(h).secs)-1/1.5)<margin))
+        fprintf('FT nonautotest: tempo correct \n')
+      else
+        fprintf('FT nonautotest: tempo incorrect \n')  
+      end
+      
+end
+
+%Show dual task performance on screen ((Non)-Automaticitytest foot stomping)
+for g = 1:N_trials
+      if str2num(letters_footnonautotest(g).reported_G)==sum(strcmp(letters_footnonautotest(g).presented, 'G'))
+        fprintf('FS nonautotest: G correct \n')
+      else
+        fprintf('FS nonautotest: G incorrect \n')
+      end 
+end  
+
+%Show tempo performance of non-automaticity experiment
+for e = 1:N_trials
+   margin=0.1; % margin of error: think about what is most convenient
+      if (all(abs(diff(presses_handnonauto(e).secs)-1/1.5)<margin))
+        fprintf('Non-auto exp.: tempo correct \n')
+      else
+        fprintf('Non-auto exp.: tempo incorrect \n')  
+      end
+end
+
+%Show tempo performance of automaticity experiment
+for f = 1:N_trials
+    margin=0.1; % margin of error: think about what is most convenient
+      if (all(abs(diff(presses_handauto(f).secs)-1/1.5)<margin))
+        fprintf('Auto exp.: tempo correct \n')
+      else
+        fprintf('Auto exp.: tempo incorrect \n')  
+      end
+end
 
 % End of the experiment, thank the participant
 Screen('TextSize',window,30);
