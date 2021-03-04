@@ -9,47 +9,32 @@
 clear all
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% START ZMQ & LSL
-% raspberry names
-zmq_proxy='lsldert00.local';
-lsl_hosts={'lsldert00', 'lsldert04'};
-
-% add lsl streams
-trigstr=cell(1);
-nstr=0;
-for ii=1:numel(lsl_hosts)
-    host=lsl_hosts{ii};
-    info_type=sprintf('type=''Digital Triggers @ %s''',host);
-    info=lsl_resolver(info_type);
-    desc=info.list();
-    if isempty(desc)
-        warning('lsl stream on host ''%s'' not found', host);
-    else
-        nstr=nstr+1;
-        fprintf('%d: name: ''%s'' type: ''%s''\n',nstr,desc(1).name,desc(1).type);
-        trigstr{nstr}=lsl_istream(info{1});
-    end
-    delete(info);
-end
-trig = lsldert_pubclient(zmq_proxy);
-cleanupObj=onCleanup(@()cleanupFun);
-
-% create session
-ses=lsl_session();
-for ii=1:nstr
-    ses.add_stream(trigstr{ii});
-end
-
-% add listener
-for ii=1:nstr
-    addlistener(trigstr{ii}, 'DataAvailable', @triglistener);
-end
+% LSL SETUP
+% LSL outlet sending events
+%
+% Create and load the lab streaming layer library
+lib = lsl_loadlib();
+%
+% Make a new stream outlet.
+% info = lsl_streaminfo([lib handle],[name],[type],[channelcount],[fs],[channelformat],[sourceid])
+% > name = name of stream; describes device/product
+% > type = content type of stream (EEG, Markers)
+% > channelcount = nr of channels per sample
+% > fs = samplking rate (Hz) as advertized by data source
+% > channelformat = cf_float32, cf__double64, cf_string, cf_int32, cf_int16
+% > sourceid = unique identifier for source or device, if available
+info = lsl_streaminfo(lib,'AutovsNAuto','Markers',1,0.0,'cf_string','sdfwerr32432');
+%
+% Open an outlet for the data to run through.
+outlet = lsl_outlet(info);
+%
+% Create marker id's
+instructions = 'instructions';
+finger_test='finger_test';
+foot_test='foot_test';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %INITIALISATION
-% start lsl session
-ses.start();
-trig.digitalout(0, 'TTL_init'); % ensures that the output is set to 0
 
 %Open Phsychtoolbox.
 PsychDefaultSetup(2);
@@ -197,7 +182,7 @@ for i=order_test %Either [1,2] or [2,1] -> determines the order of the tasks
   % Finger tapping test -> 10 trials, presents letters upon randomized speed
   if i==1
     %Instruction automaticity task finger tapping
-    trig.beep(400, 0.1, 'instructions');
+    outlet.push_sample({instructions})
     Screen('TextSize',window,25);
     DrawFormattedText(window, 'You will now perform the pre-learned sequence for the FINGER tapping task. \n  Letters will be shown on the screen (A,G,O,L) while you perform the task. \n The goal is to perform the sequence tapping while counting how many times G is presented. \n After each time you tapped the full sequence, you should tell us how many times G was presented. \n We will perform 10 trails. \n\n Note that during the tapping task you cannot talk. \n Try to keep your body movements as still as possible exept for the right hand. \n\n In between the trials you will see a fixation cross for 20 seconds. \n During the first 8 seconds you will hear a metronome sound. \n Tap the sequence on this rhythm, which is the same as you studied at home. \n\n We will start with a fixation cross on the screen for 20 seconds. \n After that the first trial will start automatically. \n So start tapping the sequence as soon as a letter on the screen appears. \n Press any key to continue and start the test.','center','center', white);
     vbl = Screen('Flip', window);
@@ -212,7 +197,6 @@ for i=order_test %Either [1,2] or [2,1] -> determines the order of the tasks
       
       % always start with a 20-25 seconds fixation cross with 8 seconds of metronome
       % sound
-      trig.beep(400, 0.1, 'rest');
       Screen('TextSize', window, 36);
       Screen('DrawLines', window, allCoords,...
         lineWidthPix, white, [xCenter yCenter], 2);
@@ -222,7 +206,7 @@ for i=order_test %Either [1,2] or [2,1] -> determines the order of the tasks
       
       %Presentation of random letters on the screen during the finger
       %tapping test + recording of the key presses
-      trig.beep(400, 0.1, 'finger_auto_dual');
+      outlet.push_sample({finger_test})
       m=1; % first key press
       %           FlushEvents('keyDown'); % option A: clear all previous key presses from the list
       KbQueueFlush; % option B: clear all previous key presses from the list
@@ -269,12 +253,11 @@ for i=order_test %Either [1,2] or [2,1] -> determines the order of the tasks
       
       % present white fixation cross for some seconds to show that
       % trial is over
-      trig.beep(400, 0.1, 'rest');
       Screen('TextSize', window, 36);
       Screen('DrawLines', window, allCoords,...
         lineWidthPix, white, [xCenter yCenter], 2);
       Screen('Flip', window);
-      WaitSecs(5); % changed this to 5 seconds, so the nirs signal has time to go back to baseline
+      WaitSecs(2);
       
       % show feedback
       % ask how many G's were presented
@@ -302,13 +285,12 @@ for i=order_test %Either [1,2] or [2,1] -> determines the order of the tasks
     
   elseif i==2 % foot test, presents letters upon randomized speed
     % Instruction automaticity task foot stomping
-    trig.beep(400, 0.1, 'instructions');
+    outlet.push_sample({instructions})
     Screen('TextSize',window,25);
     DrawFormattedText(window, 'You will now perform the pre-learned sequence for the FOOT stomping task. \n  Letters will be shown on the screen (A,G,O,L) while you perform the task. \n The goal is to perform the sequence stomping while counting how many times G is presented. \n After each time you stomped the full sequence, you should tell us how many times G was presented. \n We will perform 10 trials. \n\n Note that during the stomping task you cannot talk. \n Try to keep your body movements as still as possible exept for your right leg. \n\n In between the trials you will see a fixation cross for 20 seconds. \n During the first 8 seconds you will hear a metronome sound. \n Stomp the sequence on this rhythm, which is the same as you studied at home. \n\n We will start with a fixation cross on the screen for 20 seconds. \n After that the first trial will start automatically. \n So start stomping the sequence as soon as a letter on the screen appears. \n Press any key to continue and start the test.','center','center', white);
     vbl = Screen('Flip', window);
     KbStrokeWait; %wait for response to terminate instructions
     
-    trig.digitalout(1, 'start_rec'); % starts the recording of xsens
     for j=1:N_trials
       %Presentation of the letters on the screen (dual task). -> is random.
       %Participant has to count the amount that G was presented.
@@ -318,7 +300,6 @@ for i=order_test %Either [1,2] or [2,1] -> determines the order of the tasks
       
       % always start with a fixation cross and 8 seconds of metronome
       % sound
-      trig.beep(400, 0.1, 'rest');
       Screen('TextSize', window, 36);
       Screen('DrawLines', window, allCoords,...
         lineWidthPix, white, [xCenter yCenter], 2);
@@ -328,7 +309,7 @@ for i=order_test %Either [1,2] or [2,1] -> determines the order of the tasks
       
       %Presentation of random letters on the screen during the foot
       %stomping test
-      trig.beep(400, 0.1, 'foot_auto_dual');
+      outlet.push_sample({foot_test})
       for n=1:N_letters
         % present random letter
         Screen('TextSize', window, 100);
@@ -346,12 +327,11 @@ for i=order_test %Either [1,2] or [2,1] -> determines the order of the tasks
       
       % present white fixation cross for some seconds to show that
       % trial is over
-      trig.beep(400, 0.1, 'rest');
       Screen('TextSize', window, 36);
       Screen('DrawLines', window, allCoords,...
         lineWidthPix, white, [xCenter yCenter], 2);
       Screen('Flip', window);
-      WaitSecs(5);
+      WaitSecs(2);
       
       % show feedback
       % ask how many G's were presented
@@ -369,7 +349,6 @@ for i=order_test %Either [1,2] or [2,1] -> determines the order of the tasks
     end
     
     % After all trials completed, the end of the foot stomping task is reached.
-    trig.digitalout(0, 'stop_rec'); % stops the recording of xsens
     Screen('TextSize',window,25);
     DrawFormattedText(window, 'End of the automaticity test for the foot stomping task. \n Press any key to end this session.','center','center', white);
     vbl = Screen('Flip', window);
@@ -412,23 +391,3 @@ vbl = Screen('Flip', window);
 %Press key to end the session and return to the 'normal' screen.
 KbStrokeWait; %wait for response to terminate instructions
 sca
-
-%% end the lsl session
-delete(trig); 
-ses.stop();
-
-%% HELPER FUNCTIONS
-function triglistener(src, event)
-for ii=1:numel(event.Data)
-  info=src.info;
-  fprintf('   lsl event (%s) received @ %s with (uncorrected) timestamp %.3f \n',  event.Data{ii}, info.type, event.Timestamps(ii));
-end
-end
-
-function cleanupFun()
-delete(ses);
-delete(trigstr{1});
-delete(trigstr{2});
-delete(info);
-end
-
