@@ -78,7 +78,7 @@ N_trials = 10; % number of trials for the automaticity test
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %LOAD METRONOME SOUNDS (PsychToolbox)
-audio_dir='C:\Users\mtabo\Documents\TryOutScript\metronomesounds';
+audio_dir='C:\Users\Helena\Documents\Experiment_ME\metronomesounds'
 cd(audio_dir)
 [WAVMetronome8.wave,WAVMetronome8.fs]       = audioread('Metronome8.wav');
 [WAVMetronome600.wave,WAVMetronome600.fs]       = audioread('Metronome600.wav');
@@ -118,7 +118,7 @@ PsychPortAudio('FillBuffer', h_Metronome5, WAVMetronome5.wave);
 %SAVE FILES IN FOLDER
 
 fprintf('Select the project directory \n')
-root_dir=uigetdir('C:\Users\mtabo\Documents\TryOutScript\', 'Select the project directory');
+root_dir=uigetdir('C:\Users\Helena\Documents\pilots_M&E', 'Select the project directory');
 
 complete=0;
 while complete==0

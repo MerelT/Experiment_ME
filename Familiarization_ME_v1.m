@@ -35,7 +35,7 @@ Screen('Preference', 'SkipSyncTests', 1);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %LOAD METRONOME SOUNDS (PsychToolbox)
-audio_dir='C:\Users\mtabo\Documents\TryOutScript\metronomesounds';
+audio_dir='C:\Users\Helena\Documents\Experiment_ME\metronomesounds';
 cd(audio_dir)
 [WAVMetronome120.wave,WAVMetronome120.fs]       = audioread('Metronome120.wav');
 

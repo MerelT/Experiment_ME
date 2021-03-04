@@ -63,7 +63,7 @@ Screen('Preference', 'SkipSyncTests', 1);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %LOAD METRONOME SOUNDS (PsychToolbox)
-audio_dir='C:\Users\mtabo\Documents\TryOutScript\metronomesounds';
+audio_dir='C:\Users\Helena\Documents\Experiment_ME\metronomesounds';
 cd(audio_dir)
 [WAVMetronome8.wave,WAVMetronome8.fs]       = audioread('Metronome5.wav');
 
@@ -95,7 +95,7 @@ PsychPortAudio('FillBuffer', h_Metronome8, WAVMetronome8.wave);
 %SAVE FILES IN FOLDER
 
 fprintf('Select the project directory \n')
-root_dir=uigetdir('C:\Users\mtabo\Documents\TryOutScript\', 'Select the project directory');
+root_dir=uigetdir('C:\Users\Helena\Documents\pilots_M&E', 'Select the project directory');
 
 complete=0;
 while complete==0
