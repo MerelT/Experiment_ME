@@ -1,6 +1,6 @@
 % FAMILIARIZATION SCRIPT
 % Presenting the studied sequence on the screen for 4 minutes total(add the
-% right sequence in line 110 and 123!!!), while also a metronome sound of 90bpm
+% right sequence in line 108 and 122!!!), while also a metronome sound of 90bpm
 % (1.5Hz) is playing. 2 min practicing for each limb, for the participant
 % to get used to the experiment set up. 
 
@@ -35,7 +35,7 @@ Screen('Preference', 'SkipSyncTests', 1);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %LOAD METRONOME SOUNDS (PsychToolbox)
-audio_dir='C:\Users\mtabo\Documents\TryOutScript\metronomesounds';
+audio_dir='C:\Users\mtabo\Documents\TryOutScript\Experiment_ME\metronomesounds';
 cd(audio_dir)
 [WAVMetronome120.wave,WAVMetronome120.fs]       = audioread('Metronome120.wav');
 
@@ -114,6 +114,7 @@ WaitSecs(120)
 Screen('TextSize',window,25);
 DrawFormattedText(window,'The time to familiarize for the finger tapping task is over. \n Press any key to start practicing the seqeunce for the foot stomping task.','center', 'center', white);
 vbl = Screen('Flip', window);
+WaitSecs(5)
 KbStrokeWait; 
 
 %Presenting the sequence to study on the screen (for foot 2 min)
