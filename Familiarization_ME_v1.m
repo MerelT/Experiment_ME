@@ -5,7 +5,7 @@
 % SET RIGHT AUTOMATIC SEQUENCE
 sequenceA = '4 3 4 1 4 1 2 4 3 2 1 2';
 sequenceB = '2 1 2 3 2 1 3 2 4 2 4 1';
-sequenceauto = sequenceA; 
+sequenceauto = sequenceA;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %LSL SET UP
@@ -108,23 +108,23 @@ KbStrokeWait;
 
 %Presenting the sequence to study on the screen (for hand 2 min)
 Screen('TextSize', window, 50);
-DrawFormattedText(window, fprintf('%s', sequenceauto), 'center', 'center', white);
+DrawFormattedText(window, sprintf('%s', sequenceauto), 'center', 'center', white);
 vbl= Screen('Flip', window);
-PsychPortAudio('Start', h_Metronome120, 1, [], []); %Play metronome sound file (10 minutes)
+PsychPortAudio('Start', h_Metronome120, 1, [], []); %Play metronome sound file (2 minutes)
 WaitSecs(120)
 
 %End of finger tapping familiarization
 Screen('TextSize',window,25);
-DrawFormattedText(window,'The time to familiarize for the finger tapping task is over. \n Press any key to start practicing the seqeunce for the foot stomping task.','center', 'center', white);
+DrawFormattedText(window,'The time to familiarize for the finger tapping task is over. \n Press any key to start practicing the sequence for the foot stomping task.','center', 'center', white);
 vbl = Screen('Flip', window);
 WaitSecs(5)
 KbStrokeWait; 
 
 %Presenting the sequence to study on the screen (for foot 2 min)
 Screen('TextSize', window, 50);
-DrawFormattedText(window, fprintf('%s', sequenceauto), 'center', 'center', white);
+DrawFormattedText(window, sprintf('%s', sequenceauto), 'center', 'center', white);
 vbl= Screen('Flip', window);
-PsychPortAudio('Start', h_Metronome120, 1, [], []); %Play metronome sound file (10 minutes)
+PsychPortAudio('Start', h_Metronome120, 1, [], []); %Play metronome sound file (2 minutes)
 WaitSecs(120)
 
 Screen('TextSize', window, 25);
