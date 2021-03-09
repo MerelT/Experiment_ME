@@ -108,7 +108,7 @@ KbStrokeWait;
 
 %Presenting the sequence to study on the screen (for hand 2 min)
 Screen('TextSize', window, 50);
-DrawFormattedText(window, sprintf('%s', sequenceauto), 'center', 'center', white);
+
 vbl= Screen('Flip', window);
 PsychPortAudio('Start', h_Metronome120, 1, [], []); %Play metronome sound file (2 minutes)
 WaitSecs(120)
