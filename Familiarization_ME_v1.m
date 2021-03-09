@@ -8,26 +8,6 @@ sequenceB = '2 1 2 3 2 1 3 2 4 2 4 1';
 sequenceauto = sequenceA;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%LSL SET UP
-%LSL outlet sending events
-%
-% Create and load the lab streaming layer library
-lib = lsl_loadlib();
-%
-% Make a new stream outlet.
-% info = lsl_streaminfo([lib handle],[name],[type],[channelcount],[fs],[channelformat],[sourceid])
-% > name = name of stream; describes device/product
-% > type = content type of stream (EEG, Markers)
-% > channelcount = nr of channels per sample
-% > fs = samplking rate (Hz) as advertized by data source
-% > channelformat = cf_float32, cf__double64, cf_string, cf_int32, cf_int16
-% > sourceid = unique identifier for source or device, if available
-info = lsl_streaminfo(lib,'AutovsNAuto','Markers',1,0.0,'cf_string','sdfwerr32432');
-%
-% Open an outlet for the data to run through.
-outlet = lsl_outlet(info);
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %INITIALISATION
 
 %Open Phsychtoolbox.
