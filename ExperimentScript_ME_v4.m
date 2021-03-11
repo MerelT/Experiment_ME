@@ -76,7 +76,7 @@ sequenceB = '2 1 2 3 2 1 3 2 4 2 4 1';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %LOAD METRONOME SOUNDS (PsychToolbox)
-audio_dir='C:\Users\mtabo\Documents\TryOutScript\metronomesounds';
+audio_dir='C:\Users\mtabo\Documents\TryOutScript\Experiment_ME\metronomesounds';
 cd(audio_dir)
 [WAVMetronome8.wave,WAVMetronome8.fs]       = audioread('Metronome8.wav');
 [WAVMetronome600.wave,WAVMetronome600.fs]       = audioread('Metronome600.wav');
@@ -147,13 +147,13 @@ sequencenonauto = sequenceB;
 
 %Create a vector to represent the two different options (1=non-automatic
 %test, 2=automatic test).
-order_experiment=[1,2];
+order_experiment=[2,1];
 %Save the order of the experiment
 save('order_experiment.mat', 'order_experiment');
 
 %Create a vector to represent the two different options for non-automatic
 %tasks (3 = finger tapping, 4 = foot stomping).
-order_nonauto=[3,4];
+order_nonauto=[4,3];
 %Save the order of the non-automatic experiment
 save('order_nonauto.mat', 'order_nonauto');
 
@@ -215,7 +215,7 @@ letters_footnonautodual=struct([]);
 %Instruction experiment
 trig.beep(440, 0.2, 'instructions');
 Screen('TextSize',window,25);
-DrawFormattedText(window,'You will now start with the experiment. \n You will either start with the automatic tasks, performing the at home studied sequence, \n or with the non-automatic tasks, for which you will be presented with a new sequence, \n which you can study for 10 minutes for each limb. \n Note that for the non-automatic tasks you will also perform an automaticity test (dual task). \n This is the same test as you just did for the automatic (at home studied) sequence. \n\n Detailed instructions will appear at the start of each new task. \n\n Press any key to continue and see with which test you start.','center', 'center', white);
+DrawFormattedText(window,'You will now start with the experiment. \n You will either start with the automatic tasks, performing the at home studied sequence, \n or with the non-automatic tasks, for which you will be presented with a new sequence, \n which you can study for 10 minutes for each limb. \n Note that for the non-automatic tasks you will also perform an automaticity test (dual task). \n This is the same test as you just did for the automatic (at home studied) sequence. \n\n Detailed instructions will appear at the start of each new task. \n You can take a break in between tasks. \n This will be indicated in the on-screen instructions. \n\n Press any key to continue and see with which test you start.','center', 'center', white);
 vbl = Screen('Flip', window);
 KbStrokeWait; %wait for response to terminate instructions
 
@@ -266,7 +266,7 @@ for i=order_experiment; %Either [1,2] or [2,1] -> determines the order of the ta
                 
                 %Stimulus for finger tapping non-automatic sequence
                 for l = 1:N_trials %Will perform 11 trials
-                    presses_handnonauto(l).key=[];
+                    presses_handnonauto(l).key='';
                     %Rest period between each sequence 20-25 seconds
                     trig.beep(440, 0.2, 'rest');
                     % Fixation cross during rest
@@ -291,8 +291,9 @@ for i=order_experiment; %Either [1,2] or [2,1] -> determines the order of the ta
                         if length(presses_handnonauto(l).key)<12
                             [secs, keyCode, deltaSecs] = KbWait([],2);
                             if any(keyCode)
-                                fprintf('the key value was: %s \n', KbName(find(keyCode)));
-                                presses_handnonauto(l).key(m)=KbName(find(keyCode));
+                                key=KbName(find(keyCode));
+                                fprintf('the key value was: %s \n', key(1));
+                                presses_handnonauto(l).key(m)=key(1);
                                 presses_handnonauto(l).secs(m)=GetSecs;
                                 m=m+1;
                             elseif KbName('ESCAPE')
@@ -316,7 +317,7 @@ for i=order_experiment; %Either [1,2] or [2,1] -> determines the order of the ta
                 %Instruction automaticity task finger tapping
                 trig.beep(440, 0.2, 'instructions');
                 Screen('TextSize',window,25);
-                DrawFormattedText(window, sprintf('You will now perform the sequence you just learned during an automaticity test for the FINGER tapping task. \n %s \n\n  While you perform the task, letters will be shown on the screen (A,G,O,L). \n The goal is to perform the sequence tapping while counting how many times G is presented. \n After each time you tapped the full sequence, you should tell us how many times G was presented. \n We will perform 11 trails. \n\n Note that during the tapping task you cannot talk. \n Try to keep your body movements as still as possible exept for the right hand. \n\n In between the trials you will see a white fixation cross for 20 seconds. \n During the first few seconds you will hear a metronome sound. \n Tap the sequence on this rhythm, which is the same as you practiced before. \n \n We will start with a fixation cross on the screen for 20 seconds. \n After that the first trial will start automatically. \n So start tapping the sequence as soon as a letter on the screen appears. \n When ready: press any key to continue and start the test.', sequencenonauto),'center','center', white);
+                DrawFormattedText(window, sprintf('You will now perform the sequence you just learned during an automaticity test for the FINGER tapping task. \n %s \n\n  While you perform the task, letters will be shown on the screen (A,G,O,L). \n The goal is to perform the sequence tapping while counting how many times G is presented. \n After each time you tapped the full sequence, you should tell us how many times G was presented. \n For answering this question, \n keep in mind that when the answer is 4 you press 4 and not Return (Enter) on the keyboard. \n\n We will perform 11 trails. \n Note that during the tapping task you cannot talk. \n Try to keep your body movements as still as possible exept for the right hand. \n\n In between the trials you will see a white fixation cross for 20 seconds. \n During the first few seconds you will hear a metronome sound. \n Tap the sequence on this rhythm, which is the same as you practiced before. \n \n We will start with a fixation cross on the screen for 20 seconds. \n After that the first trial will start automatically. \n So start tapping the sequence as soon as a letter on the screen appears. \n When ready: press any key to continue and start the test.', sequencenonauto),'center','center', white);
                 vbl = Screen('Flip', window);
                 KbStrokeWait; %wait for response to terminate instructions
                 
@@ -484,7 +485,7 @@ for i=order_experiment; %Either [1,2] or [2,1] -> determines the order of the ta
                 % Instruction automaticity task foot stomping
                 trig.beep(440, 0.2, 'instructions');
                 Screen('TextSize',window,25);
-                DrawFormattedText(window, sprintf('You will now perform the sequence you just learned for an automaticity test for the FOOT stomping task. \n %s \n\n While you perform the task, letters will be shown on the screen (A,G,O,L). \n The goal is to perform the sequence stomping while counting how many times G is presented. \n After each time you stomped the full sequence, you should tell us how many times G was presented. \n We will perform 11 trials. \n\n Note that during the stomping task you cannot talk. \n Try to keep your body movements as still as possible exept for your right leg. \n\n In between the trials you will see a fixation cross for 20 seconds. \n During the first few seconds you will hear a metronome sound. \n Stomp the sequence on this rhythm, which is the same as you studied at home. \n\n We will start with a fixation cross on the screen for 20 seconds. \n After that the first trial will start automatically. \n So start stomping the sequence as soon as a letter on the screen appears. \n When ready: press any key to continue and start the test.', sequencenonauto),'center','center', white);
+                DrawFormattedText(window, sprintf('You will now perform the sequence you just learned for an automaticity test for the FOOT stomping task. \n %s \n\n While you perform the task, letters will be shown on the screen (A,G,O,L). \n The goal is to perform the sequence stomping while counting how many times G is presented. \n After each time you stomped the full sequence, you should tell us how many times G was presented. \n For answering this question, \n keep in mind that when the answer is 4 you press 4 and not Return (Enter) on the keyboard \n\n We will perform 11 trials. \n Note that during the stomping task you cannot talk. \n Try to keep your body movements as still as possible exept for your right leg. \n\n In between the trials you will see a fixation cross for 20 seconds. \n During the first few seconds you will hear a metronome sound. \n Stomp the sequence on this rhythm, which is the same as you studied at home. \n\n We will start with a fixation cross on the screen for 20 seconds. \n After that the first trial will start automatically. \n So start stomping the sequence as soon as a letter on the screen appears. \n When ready: press any key to continue and start the test.', sequencenonauto),'center','center', white);
                 vbl = Screen('Flip', window);
                 KbStrokeWait; %wait for response to terminate instructions
                 
@@ -583,7 +584,7 @@ for i=order_experiment; %Either [1,2] or [2,1] -> determines the order of the ta
                 
                 %Stimulus for finger tapping automatic sequence
                 for o = 1:N_trials % Will perform 11 trials
-                    presses_handauto(o).key=[];
+                    presses_handauto(o).key='';
                     %Rest period 20-25 seconds
                     trig.beep(440, 0.2, 'rest');
                     Screen('TextSize', window, 36);
@@ -608,8 +609,9 @@ for i=order_experiment; %Either [1,2] or [2,1] -> determines the order of the ta
                         if length(presses_handauto(o).key)<12
                             [secs, keyCode, deltaSecs] = KbWait([],2);
                             if any(keyCode)
-                                fprintf('the key value was: %s \n', KbName(find(keyCode)));
-                                presses_handauto(o).key(p)=KbName(find(keyCode));
+                                key=KbName(find(keyCode));
+                                fprintf('the key value was: %s \n', key(1));
+                                presses_handauto(o).key(p)=key(1);
                                 presses_handauto(o).secs(p)=GetSecs;
                                 p=p+1;
                             elseif KbName('ESCAPE')
