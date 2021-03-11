@@ -8,11 +8,11 @@ clear all
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % START ZMQ & LSL
-raspberry names
+% raspberry names
 zmq_proxy='lsldert00.local';
 lsl_hosts={'lsldert00', 'lsldert04'};
 
-add lsl streams
+% add lsl streams
 trigstr=cell(1);
 nstr=0;
 for ii=1:numel(lsl_hosts)
@@ -32,13 +32,13 @@ end
 trig = lsldert_pubclient(zmq_proxy);
 cleanupObj=onCleanup(@()cleanupFun);
 
-create session
+% create session
 ses=lsl_session();
 for ii=1:nstr
     ses.add_stream(trigstr{ii});
 end
 
-add listener
+% add listener
 for ii=1:nstr
     addlistener(trigstr{ii}, 'DataAvailable', @triglistener);
 end
