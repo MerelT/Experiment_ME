@@ -207,7 +207,7 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
     %Instruction automaticity task finger tapping
     trig.beep(440, 0.2, 'instructions');
     Screen('TextSize',window,25);
-    DrawFormattedText(window, sprintf('You will now perform the pre-learned sequence for the FINGER tapping task: \n %s \n\n  While you perform the task, letters will be shown on the screen (A,G,O,L). \n The goal is to perform the sequence tapping while counting how many times G is presented. \n After each time you tapped the full sequence, you should tell us how many times G was presented. \n We will perform 11 trails. \n\n Note that during the tapping task you cannot talk. \n Try to keep your body movements as still as possible exept for the right hand. \n\n In between the trials you will see a fixation cross for 20 seconds. \n During the first few seconds you will hear a metronome sound. \n Tap the sequence on this rhythm, which is the same as you studied at home. \n\n We will start with a fixation cross on the screen for 20 seconds. \n After that the first trial will start automatically. \n So start tapping the sequence as soon as a letter on the screen appears. \n When ready: press any key to continue and start the test.', sequenceauto),'center','center', white);
+    DrawFormattedText(window, sprintf('You will now perform the pre-learned sequence for the FINGER tapping task: \n %s \n\n  While you perform the task, letters will be shown on the screen (A,G,O,L). \n The goal is to perform the sequence tapping while counting how many times G is presented. \n After each time you tapped the full sequence, you should tell us how many times G was presented. \n For answering this question, \n keep in mind that if the answer is 4 you press 4 and not Return (Enter) on the keyboard. \n\n We will perform 11 trails. \n Note that during the tapping task you cannot talk. \n Try to keep your body movements as still as possible exept for the right hand. \n\n In between the trials you will see a fixation cross for 20 seconds. \n During the first few seconds you will hear a metronome sound. \n Tap the sequence on this rhythm, which is the same as you studied at home. \n\n We will start with a fixation cross on the screen for 20 seconds. \n After that the first trial will start automatically. \n So start tapping the sequence as soon as a letter on the screen appears. \n When ready: press any key to continue and start the test.', sequenceauto),'center','center', white);
     vbl = Screen('Flip', window);
     KbStrokeWait; %wait for response to terminate instructions
     
@@ -301,7 +301,7 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
     % After all trials completed, the end of the finger tapping task is
     % reached.
     Screen('TextSize',window,30);
-    DrawFormattedText(window, 'This is the end of the automaticity test for the finger tapping task. \n Press any key to end this session.' ,'center','center', white);
+    DrawFormattedText(window, 'This is the end of the automaticity test for the finger tapping task. \n You can take a rest if needed. \n When ready: press any key to end this session.' ,'center','center', white);
     vbl = Screen('Flip', window);
     save('letters_handautodual.mat', 'letters_handautodual'); % save the letters that were presented and the reported number of g's
     save('presses_handautodual.mat', 'presses_handautodual'); % save which keys where pressed during the experiment
@@ -313,7 +313,7 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
     % Instruction automaticity task foot stomping
     trig.beep(440, 0.2, 'instructions');
     Screen('TextSize',window,25);
-    DrawFormattedText(window, sprintf('You will now perform the pre-learned sequence for the FOOT stomping task: \n %s \n\n While you perform the task, letters will be shown on the screen (A,G,O,L). \n The goal is to perform the sequence stomping while counting how many times G is presented. \n After each time you stomped the full sequence, you should tell us how many times G was presented. \n We will perform 11 trials. \n\n Note that during the stomping task you cannot talk. \n Try to keep your body movements as still as possible exept for your right leg. \n\n In between the trials you will see a fixation cross for 20 seconds. \n During the first few seconds you will hear a metronome sound. \n Stomp the sequence on this rhythm, which is the same as you studied at home. \n\n We will start with a fixation cross on the screen for 20 seconds. \n After that the first trial will start automatically. \n So start stomping the sequence as soon as a letter on the screen appears. \n When ready: press any key to continue and start the test.', sequenceauto),'center','center', white);
+    DrawFormattedText(window, sprintf('You will now perform the pre-learned sequence for the FOOT stomping task: \n %s \n\n While you perform the task, letters will be shown on the screen (A,G,O,L). \n The goal is to perform the sequence stomping while counting how many times G is presented. \n After each time you stomped the full sequence, you should tell us how many times G was presented. \n For answering this question, \n keep in mind that if the answer is 4 you press 4 and not Return (Enter) on the keyboard. \n\n We will perform 11 trials. \n Note that during the stomping task you cannot talk. \n Try to keep your body movements as still as possible exept for your right leg. \n\n In between the trials you will see a fixation cross for 20 seconds. \n During the first few seconds you will hear a metronome sound. \n Stomp the sequence on this rhythm, which is the same as you studied at home. \n\n We will start with a fixation cross on the screen for 20 seconds. \n After that the first trial will start automatically. \n So start stomping the sequence as soon as a letter on the screen appears. \n When ready: press any key to continue and start the test.', sequenceauto),'center','center', white);
     vbl = Screen('Flip', window);
     KbStrokeWait; %wait for response to terminate instructions
     
@@ -379,7 +379,7 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
     % After all trials completed, the end of the foot stomping task is reached.
     trig.digitalout(0, 'stop_rec'); % stops the recording of xsens
     Screen('TextSize',window,25);
-    DrawFormattedText(window, 'End of the automaticity test for the foot stomping task. \n Press any key to end this session.','center','center', white);
+    DrawFormattedText(window, 'End of the automaticity test for the foot stomping task. \n You can take a rest if needed. \n When ready: press any key to end this session.','center','center', white);
     vbl = Screen('Flip', window);
     save('letters_footautodual.mat', 'letters_footautodual'); % save the letters that were presented and the reported number of g's
     KbStrokeWait; %wait for response to terminate instructions
@@ -402,7 +402,13 @@ for h = 1:N_trials
       else
         fprintf('T%d: tempo incorrect \n', h)  
       end
-      
+%      if str2num(presses_handautodual(h).key)==sum(strcmp(sequenceauto))
+%          fprintf('T%d: seq correct \n', h)
+%      else
+%          fprintf('T%d: seq incorrect \n', h)
+%      end 
+         
+         
 end
 
 %Show dual task performance in command window (foot stomping)
