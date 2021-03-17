@@ -68,7 +68,7 @@ Screen('Preference', 'SkipSyncTests', 1);
 
 t1 = 20; %Resting period in seconds
 t2 = 5;  %Random interval around the resting period time
-t3 = 8.5; %Duration of a trial (tapping/stomping the sequence 1 time)
+t3 = 9; %Duration of a trial (tapping/stomping the sequence 1 time)
 N_letters = 8; % 8 letters presented during a trial for the automaticity test
 N_trials = 11; % number of trials for the automaticity test
 sequenceA = '4 3 4 1 4 1 2 4 3 2 1 2';
@@ -136,6 +136,12 @@ if ~exist(sub_dir)
     mkdir(sub_dir)
 end
 cd(sub_dir)
+
+logname=sprintf('%s_%s_triggers.log', sub, rec); diary(logname);
+% save current script in subject directory
+script=mfilename('fullpath');
+script_name=mfilename;
+copyfile(sprintf('%s.m', script), fullfile(sub_dir, sprintf('%s_%s.m', sub, script_name)))
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %RANDOMIZATION
@@ -260,7 +266,7 @@ for i=order_experiment; %Either [1,2] or [2,1] -> determines the order of the ta
                 
                 %Instructions non-automatic finger tapping task
                 Screen('TextSize',window,25);
-                DrawFormattedText(window, sprintf('You will now perform the finger tapping task for the sequence you just practiced (non-automatic). \n There is a total of 11 trials, so performing the sequence 11 times. \n  In between each trial there is a rest period of 20 seconds. \n During this rest you will hear a metronome sound, tap the sequence according to this interval sound. \n Trials and rest periods are indicated with red(= trial) and white(= rest) fixation crosses showing on the screen. \n\n When the experiment starts you cannot talk anymore. \n Furthermore, it is important to stay still except for your right hand. \n If you press any key, the experiment starts. \n It will start with a rest period. \n Whenever a RED fixation cross appears on the screen, you should start tapping the sequence: \n %s \n When ready: press any key to start the finger tapping experiment.', sequencenonauto),'center','center', white);
+                DrawFormattedText(window, sprintf('You will now perform the finger tapping task for the sequence you just practiced (non-automatic). \n There is a total of 11 trials, so performing the sequence 11 times. \n  In between each trial there is a rest period of 20 seconds. \n During this rest you will hear a metronome sound, tap the sequence according to this interval sound. \n Trials and rest periods are indicated with red(= trial) and white(= rest) fixation crosses showing on the screen. \n\n When the experiment starts you cannot talk anymore. \n Furthermore, it is important to stay still except for your right hand. \n Keep your eyes open (also during the rest periods). \n If you press any key, the experiment starts. \n It will start with a rest period. \n Whenever a RED fixation cross appears on the screen, you should start tapping the sequence: \n %s \n When ready: press any key to start the finger tapping experiment.', sequencenonauto),'center','center', white);
                 vbl = Screen('Flip', window);
                 KbStrokeWait; %wait for response to terminate instructions
                 
@@ -305,9 +311,16 @@ for i=order_experiment; %Either [1,2] or [2,1] -> determines the order of the ta
                     
                 end
                 
+                % Short fixation cross at the end of all trials before text
+                % appears
+                trig.beep(440, 0.2, 'rest');
+                Screen('TextSize', window, 36);
+                Screen('DrawLines', window, allCoords,...
+                        lineWidthPix, white, [xCenter yCenter], 2);
+                Screen('Flip', window)
+                WaitSecs (5)
                 
                 % End of the non-automatic finger tapping task is reached.
-                trig.beep(440, 0.2, 'rest');
                 Screen('TextSize', window, 25);
                 DrawFormattedText(window, 'This is the end of the non-automatic finger tapping task. \n Take a rest if needed. \n When ready: press any key to continue with the automaticity test for this task.', 'center', 'center', white);
                 vbl= Screen('Flip', window);
@@ -317,7 +330,7 @@ for i=order_experiment; %Either [1,2] or [2,1] -> determines the order of the ta
                 %Instruction automaticity task finger tapping
                 trig.beep(440, 0.2, 'instructions');
                 Screen('TextSize',window,25);
-                DrawFormattedText(window, sprintf('You will now perform the sequence you just learned during an automaticity test for the FINGER tapping task. \n %s \n\n  While you perform the task, letters will be shown on the screen (A,G,O,L). \n The goal is to perform the sequence tapping while counting how many times G is presented. \n After each time you tapped the full sequence, you should tell us how many times G was presented. \n For answering this question, \n keep in mind that when the answer is 4 you press 4 and not Return (Enter) on the keyboard. \n\n We will perform 11 trails. \n Note that during the tapping task you cannot talk. \n Try to keep your body movements as still as possible exept for the right hand. \n\n In between the trials you will see a white fixation cross for 20 seconds. \n During the first few seconds you will hear a metronome sound. \n Tap the sequence on this rhythm, which is the same as you practiced before. \n \n We will start with a fixation cross on the screen for 20 seconds. \n After that the first trial will start automatically. \n So start tapping the sequence as soon as a letter on the screen appears. \n When ready: press any key to continue and start the test.', sequencenonauto),'center','center', white);
+                DrawFormattedText(window, sprintf('You will now perform the sequence you just learned during an automaticity test for the FINGER tapping task. \n %s \n\n  While you perform the task, letters will be shown on the screen (A,G,O,L). \n The goal is to perform the sequence tapping while counting how many times G is presented. \n After each time you tapped the full sequence, you should tell us how many times G was presented. \n For answering this question, \n keep in mind that when the answer is 4 you press 4 and not Return (Enter) on the keyboard. \n\n We will perform 11 trails. \n Note that during the tapping task you cannot talk. \n Try to keep your body movements as still as possible exept for the right hand. \n Keep your eyes open (also during the rest periods). \n\n In between the trials you will see a white fixation cross for 20 seconds. \n During the first few seconds you will hear a metronome sound. \n Tap the sequence on this rhythm, which is the same as you practiced before. \n \n We will start with a fixation cross on the screen for 20 seconds. \n After that the first trial will start automatically. \n So start tapping the sequence as soon as a letter on the screen appears. \n When ready: press any key to continue and start the test.', sequencenonauto),'center','center', white);
                 vbl = Screen('Flip', window);
                 KbStrokeWait; %wait for response to terminate instructions
                 
@@ -446,7 +459,7 @@ for i=order_experiment; %Either [1,2] or [2,1] -> determines the order of the ta
                 %Instructions non-automatic foot stomping task
                 trig.beep(440, 0.2, 'instructions');
                 Screen('TextSize',window,25);
-                DrawFormattedText(window, sprintf('You will now perform the foot stomping experiment for the sequence you just practiced (non-automatic). \n There is a total of 11 trials, so performing the sequence 11 times. \n In between each trial there is a rest period of 20 seconds. \n During this rest you will hear a metronome sound, stomp the sequence according to this interval sound. \n Trials and rest periods are indicated with red(= trial) and white(=rest) fixation crosses presented on the screen. \n\n When the experiment starts you cannot talk anymore. \n Furthermore, it is important to stay still except for your right leg. \n If you press any key, the experiment starts right away. \n It will start with a rest period. \n Whenever a RED fixation cross appears on the screen, you should start stomping the sequence: \n %s \n When ready: press any key to start the foot stomping experiment.', sequencenonauto),'center', 'center', white);
+                DrawFormattedText(window, sprintf('You will now perform the foot stomping experiment for the sequence you just practiced (non-automatic). \n There is a total of 11 trials, so performing the sequence 11 times. \n In between each trial there is a rest period of 20 seconds. \n During this rest you will hear a metronome sound, stomp the sequence according to this interval sound. \n Trials and rest periods are indicated with red(= trial) and white(=rest) fixation crosses presented on the screen. \n\n When the experiment starts you cannot talk anymore. \n Furthermore, it is important to stay still except for your right leg. \n Keep your eyes open (also during the rest periods). \n If you press any key, the experiment starts right away. \n It will start with a rest period. \n Whenever a RED fixation cross appears on the screen, you should start stomping the sequence: \n %s \n When ready: press any key to start the foot stomping experiment.', sequencenonauto),'center', 'center', white);
                 vbl = Screen('Flip', window);
                 KbStrokeWait; %wait for response to terminate instructions
                 
@@ -474,6 +487,14 @@ for i=order_experiment; %Either [1,2] or [2,1] -> determines the order of the ta
                     
                 end
                 
+                % Short fixation cross at the end of all trials before text
+                % appears
+                Screen('TextSize', window, 36);
+                Screen('DrawLines', window, allCoords,...
+                        lineWidthPix, white, [xCenter yCenter], 2);
+                Screen('Flip', window)
+                WaitSecs (5)
+                
                 % End of the non-automatic foot stomping task
                 trig.beep(440, 0.2, 'rest');
                 Screen('TextSize', window, 25);
@@ -485,7 +506,7 @@ for i=order_experiment; %Either [1,2] or [2,1] -> determines the order of the ta
                 % Instruction automaticity task foot stomping
                 trig.beep(440, 0.2, 'instructions');
                 Screen('TextSize',window,25);
-                DrawFormattedText(window, sprintf('You will now perform the sequence you just learned for an automaticity test for the FOOT stomping task. \n %s \n\n While you perform the task, letters will be shown on the screen (A,G,O,L). \n The goal is to perform the sequence stomping while counting how many times G is presented. \n After each time you stomped the full sequence, you should tell us how many times G was presented. \n For answering this question, \n keep in mind that when the answer is 4 you press 4 and not Return (Enter) on the keyboard \n\n We will perform 11 trials. \n Note that during the stomping task you cannot talk. \n Try to keep your body movements as still as possible exept for your right leg. \n\n In between the trials you will see a fixation cross for 20 seconds. \n During the first few seconds you will hear a metronome sound. \n Stomp the sequence on this rhythm, which is the same as you studied at home. \n\n We will start with a fixation cross on the screen for 20 seconds. \n After that the first trial will start automatically. \n So start stomping the sequence as soon as a letter on the screen appears. \n When ready: press any key to continue and start the test.', sequencenonauto),'center','center', white);
+                DrawFormattedText(window, sprintf('You will now perform the sequence you just learned for an automaticity test for the FOOT stomping task. \n %s \n\n While you perform the task, letters will be shown on the screen (A,G,O,L). \n The goal is to perform the sequence stomping while counting how many times G is presented. \n After each time you stomped the full sequence, you should tell us how many times G was presented. \n For answering this question, \n keep in mind that when the answer is 4 you press 4 and not Return (Enter) on the keyboard \n\n We will perform 11 trials. \n Note that during the stomping task you cannot talk. \n Try to keep your body movements as still as possible exept for your right leg. \n Keep your eyes open (also during the rest periods). \n\n In between the trials you will see a fixation cross for 20 seconds. \n During the first few seconds you will hear a metronome sound. \n Stomp the sequence on this rhythm, which is the same as you studied at home. \n\n We will start with a fixation cross on the screen for 20 seconds. \n After that the first trial will start automatically. \n So start stomping the sequence as soon as a letter on the screen appears. \n When ready: press any key to continue and start the test.', sequencenonauto),'center','center', white);
                 vbl = Screen('Flip', window);
                 KbStrokeWait; %wait for response to terminate instructions
                 
@@ -578,7 +599,7 @@ for i=order_experiment; %Either [1,2] or [2,1] -> determines the order of the ta
             if k==5;
                 %Automatic finger tapping task instructions
                 Screen('TextSize',window,25);
-                DrawFormattedText(window, sprintf('You will now perform the FINGER tapping task for the sequence you studied at home (automatic). \n %s \n\n There is a total of 11 trials, so performing the sequence 11 times. \n  In between each trial there is a rest period of 20 seconds. \n During this rest you will hear a metronome sound, tap the sequence according to this interval sound. \n Trials and rest periods are indicated with red(= trial) and white(= rest) fixation crosses presented on the screen. \n\n When the experiment starts you cannot talk anymore. \n Furthermore, it is important to stay still except for your right hand. \n If you press any key, the experiment starts right away. \n It will start with a rest period. \n Whenever a RED fixation cross appears on the screen, you should start tapping the sequence. \n When ready: press any key to start the finger tapping experiment.', sequenceauto),'center','center', white);
+                DrawFormattedText(window, sprintf('You will now perform the FINGER tapping task for the sequence you studied at home (automatic). \n %s \n\n There is a total of 11 trials, so performing the sequence 11 times. \n  In between each trial there is a rest period of 20 seconds. \n During this rest you will hear a metronome sound, tap the sequence according to this interval sound. \n Trials and rest periods are indicated with red(= trial) and white(= rest) fixation crosses presented on the screen. \n\n When the experiment starts you cannot talk anymore. \n Furthermore, it is important to stay still except for your right hand. \n Keep your eyes open (also during the rest periods). \n If you press any key, the experiment starts right away. \n It will start with a rest period. \n Whenever a RED fixation cross appears on the screen, you should start tapping the sequence. \n When ready: press any key to start the finger tapping experiment.', sequenceauto),'center','center', white);
                 vbl = Screen('Flip', window);
                 KbStrokeWait;
                 
@@ -623,6 +644,14 @@ for i=order_experiment; %Either [1,2] or [2,1] -> determines the order of the ta
                     
                 end
                 
+                % Short fixation cross at the end of all trials before text
+                % appears
+                Screen('TextSize', window, 36);
+                Screen('DrawLines', window, allCoords,...
+                        lineWidthPix, white, [xCenter yCenter], 2);
+                Screen('Flip', window)
+                WaitSecs (5)
+                
                 %End of the automatic finger tapping task
                 trig.beep(440, 0.2, 'rest');
                 Screen('TextSize', window, 25);
@@ -638,7 +667,7 @@ for i=order_experiment; %Either [1,2] or [2,1] -> determines the order of the ta
                 % Automatic foot stomping instructions
                 trig.beep(440, 0.2, 'instructions');
                 Screen('TextSize',window,25);
-                DrawFormattedText(window, sprintf('You will now perform the FOOT stomping experiment for the sequence you studied at home (automatic). \n %s \n\n There is a total of 11 trials, so performing the sequence 11 times. \n In between each trial there is a rest period of 20 seconds. \n During this rest you will hear a metronome sound, stomp the sequence according to this interval sound. \n Trials and rest periods are indicated with red(= trial) and white(= rest)fixation crosses presented on the screen. \n\n When the experiment starts you cannot talk anymore. \n Furthermore, it is important to stay still except for your right leg. \n If you press any key, the experiment starts right away. \n It will start with a rest period. \n Whenever a RED fixation cross appears on the screen, you should start stomping the sequence. \n When ready: press any key to start the foot stomping experiment.', sequenceauto), 'center', 'center', white);
+                DrawFormattedText(window, sprintf('You will now perform the FOOT stomping experiment for the sequence you studied at home (automatic). \n %s \n\n There is a total of 11 trials, so performing the sequence 11 times. \n In between each trial there is a rest period of 20 seconds. \n During this rest you will hear a metronome sound, stomp the sequence according to this interval sound. \n Trials and rest periods are indicated with red(= trial) and white(= rest)fixation crosses presented on the screen. \n\n When the experiment starts you cannot talk anymore. \n Furthermore, it is important to stay still except for your right leg. \n Keep your eyes open (also during the rest periods). \n If you press any key, the experiment starts right away. \n It will start with a rest period. \n Whenever a RED fixation cross appears on the screen, you should start stomping the sequence. \n When ready: press any key to start the foot stomping experiment.', sequenceauto), 'center', 'center', white);
                 vbl = Screen('Flip', window);
                 KbStrokeWait;
                 
@@ -665,6 +694,14 @@ for i=order_experiment; %Either [1,2] or [2,1] -> determines the order of the ta
                     WaitSecs (t3)
                     
                 end
+                
+                % Short fixation cross at the end of all trials before text
+                % appears
+                Screen('TextSize', window, 36);
+                Screen('DrawLines', window, allCoords,...
+                        lineWidthPix, white, [xCenter yCenter], 2);
+                Screen('Flip', window)
+                WaitSecs (5)
                 
                 % End of the automatic foot stomping task.
                 trig.beep(440, 0.2, 'rest');
@@ -693,7 +730,7 @@ for h = 1:N_trials
      end 
       %Show if the tempo was correct. ! reflect if you want to show
       %this, because we cannot show this result for the foot stomping
-      margin=0.1; % margin of error: think about what is most convenient
+      margin=0.25; % margin of error: think about what is most convenient
       if (all(abs(diff(presses_handnonautodual(h).secs)-1/1.5)<margin))
         fprintf('T%d: tempo correct \n', h)
       else
@@ -716,7 +753,7 @@ end
 %Show tempo performance of finger tapping task of non-automaticity experiment
 fprintf('Finger NonAuto \n')
 for e = 1:N_trials
-   margin=0.1; % margin of error: think about what is most convenient
+   margin=0.25; % margin of error: think about what is most convenient
       if (all(abs(diff(presses_handnonauto(e).secs)-1/1.5)<margin))
         fprintf('T%d: tempo correct \n', e)
       else
@@ -727,7 +764,7 @@ end
 %Show tempo performance of finger tapping task of automaticity experiment
 fprintf('Finger Auto \n')
 for f = 1:N_trials
-    margin=0.1; % margin of error: think about what is most convenient
+    margin=0.25; % margin of error: think about what is most convenient
       if (all(abs(diff(presses_handauto(f).secs)-1/1.5)<margin))
         fprintf('T%d: tempo correct \n', f)
       else
@@ -746,7 +783,7 @@ sca
 %% end the lsl session
 delete(trig); 
 ses.stop();
-
+diary off; 
 %% HELPER FUNCTIONS
 function triglistener(src, event)
 for ii=1:numel(event.Data)
