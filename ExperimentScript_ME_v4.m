@@ -14,7 +14,7 @@ clear all
 %% START ZMQ & LSL
 % raspberry names
 zmq_proxy='lsldert00.local';
-lsl_hosts={'lsldert00', 'lsldert04'};
+lsl_hosts={'lsldert00', 'lsldert04', 'lsldert05'};
 
 % add lsl streams
 trigstr=cell(1);
@@ -52,6 +52,7 @@ end
 % start lsl session
 ses.start();
 trig.digitalout(0, 'TTL_init'); % ensures that the output is set to 0
+trig.pulseIR(3, 0.2); % start trigger for the nirs recording
 
 %Open Phsychtoolbox.
 PsychDefaultSetup(2);
@@ -826,6 +827,7 @@ KbStrokeWait;
 sca
 
 %% end the lsl session
+trig.pulseIR(3, 0.2); % stop trigger for the nirs recording
 delete(trig); 
 ses.stop();
 diary off; 
