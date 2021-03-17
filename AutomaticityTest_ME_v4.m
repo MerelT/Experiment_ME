@@ -130,8 +130,8 @@ cd(sub_dir)
 %The sequences used for this study
 sequenceA = '4 3 4 1 4 1 2 4 3 2 1 2';
 sequenceB = '2 1 2 3 2 1 3 2 4 2 4 1';
-sequenceprintA = 'R3R1R12R3212';
-sequenceprintB = '21232132R2R1'; 
+sequenceprintA = {'Return', '3', 'Return', '1' ,'Return' '1', '2','Return', '3','2','1','2'};
+sequenceprintB= {'2','1','2', '3','2','1','3', '2', 'return', '2', 'Return','1' };
 
 %Parameters for the resting period in between the trials
 t1 = 20; %Resting period in seconds
@@ -198,9 +198,8 @@ lineWidthPix = 4;% Set the line width for the fixation cross
 
 %Empty structure for key presses -> use later again so it saves the key
 %presses within this structure -> save at the end
-presses_handautodual=struct([]);
-letters_handautodual=struct([]); % same for the presented letters of the hand + the answer
-letters_footautodual=struct([]); % same for the presented letters of the foot + the answer
+events_handautodual=struct([]); % same for the presented letters of the hand + the answer
+events_footautodual=struct([]); % same for the presented letters of the foot + the answer
 
 %Instruction automaticity test
 Screen('TextSize',window,25);
@@ -223,9 +222,10 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
     for j=1:N_trials
       %Presentation of the letters on the screen (dual task). -> is random.
       %Participant has to count the amount that G was presented.
-      Letterlist= {'A', 'G', 'O', 'L'};
+      Letterlist='AGOL';
       letter_order=randi(length(Letterlist), 1, N_letters);
-      letters_handautodual(j).presented =Letterlist(letter_order);
+      value={Letterlist(letter_order)};
+      onset=GetSecs;
       
       % Always start with a 20-25 seconds fixation cross with 8 seconds of metronome
       % sound
@@ -240,13 +240,15 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
       %Presentation of random letters on the screen during the finger
       %tapping test + recording of the key presses
       %trig.beep(440, 0.2, 'finger_auto_dual');
+      % preallocate table with key presses
+      keypresses=table('Size', [12, 3], 'VariableNames', {'onset', 'duration', 'value'}, 'VariableTypes', {'double', 'double', 'cell'});
       m=1; % first key press
       %           FlushEvents('keyDown'); % option A: clear all previous key presses from the list
       KbQueueFlush; % option B: clear all previous key presses from the list
       for n=1:N_letters
         % Present random letter
         Screen('TextSize', window, 100);
-        DrawFormattedText(window, [cell2mat(letters_handautodual(j).presented(n))],'center','center', white);
+        DrawFormattedText(window, value{1}(n),'center','center', white);
         vbl = Screen('Flip', window);
         time_letter=rand(1)+0.5; %Speed with which the letters are presented = A randomized value between 0 and 1, + 0.5 sec
         
@@ -265,10 +267,14 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
             if isempty(find(firstPress~=lastPress)) % no key was pressed twice
               keys=KbName(find(firstPress)); % find the pressed keys
               [timing, idx]=sort(firstPress(find(firstPress))); % get timing of key presses in ascending order
-              keys=keys(idx); % sort the pressed keys in ascending order
+              if length(idx)>1
+                keys=keys(idx); % sort the pressed keys in ascending order
+              else
+                keys={keys};
+              end
               key_n=length(keys); % number of pressed keys
-              presses_handautodual(j).key(m:m+key_n-1)=keys;
-              presses_handautodual(j).secs(m:m+key_n-1)=timing;
+              keypresses.onset(m:m+key_n-1)=timing';
+              keypresses.value(m:m+key_n-1)=keys;
               m=m+key_n;
             else
               error('key was pressed twice') % if this error occurs we need to find a way to handle this
@@ -285,6 +291,7 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
       
       % Present white fixation cross for some seconds to show that
       % trial is over
+      duration=GetSecs-onset;
       %trig.beep(440, 0.2, 'rest');
       Screen('TextSize', window, 36);
       Screen('DrawLines', window, allCoords,...
@@ -297,8 +304,11 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
       DrawFormattedText(window, 'How many times was G presented? ','center','center', white);
       vbl = Screen('Flip', window);
       [secs, keyCode, deltaSecs]=KbWait;
-      letters_handautodual(j).reported_G=KbName(find(keyCode));
-      DrawFormattedText(window, ['Your answer: ' letters_handautodual(j).reported_G '\n Press any key to continue.'],'center','center', white);
+      % save the response and the key presses
+      response={KbName(find(keyCode))};
+      events_handautodual(j).stimuli=table(onset,duration, value, response);
+      events_handautodual(j).responses=keypresses;
+      DrawFormattedText(window, ['Your answer: ' response{1} '\n Press any key to continue.'],'center','center', white);
       vbl = Screen('Flip', window);
       KbStrokeWait; %wait for response to terminate instruction
       DrawFormattedText(window, 'Press any key to continue with the next trail. \n Note that you will first start with a fixation cross again. \n Start tapping the sequence as soon as a letter on the screen appears.' ,'center','center', white);
@@ -311,8 +321,7 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
     Screen('TextSize',window,30);
     DrawFormattedText(window, 'This is the end of the automaticity test for the finger tapping task. \n You can take a rest if needed. \n When ready: press any key to end this session.' ,'center','center', white);
     vbl = Screen('Flip', window);
-    save('letters_handautodual.mat', 'letters_handautodual'); % save the letters that were presented and the reported number of g's
-    save('presses_handautodual.mat', 'presses_handautodual'); % save which keys where pressed during the experiment
+    save('events_handautodual.mat', 'events_handautodual'); % save the events
     KbStrokeWait; %wait for response to terminate instructions
     
     
@@ -329,9 +338,10 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
     for j=1:N_trials
       %Presentation of the letters on the screen (dual task). -> is random.
       %Participant has to count the amount that G was presented.
-      Letterlist= {'A', 'G', 'O', 'L'};
+      Letterlist= 'AGOL';
       letter_order=randi(length(Letterlist), 1, N_letters);
-      letters_footautodual(j).presented =Letterlist(letter_order);
+      value={Letterlist(letter_order)};
+      onset=GetSecs;
       
       % Always start with a fixation cross and 8 seconds of metronome
       % sound
@@ -349,7 +359,7 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
       for n=1:N_letters
         % present random letter
         Screen('TextSize', window, 100);
-        DrawFormattedText(window, [cell2mat(letters_footautodual(j).presented(n))],'center','center', white);
+        DrawFormattedText(window, value{1}(n),'center','center', white);
         vbl = Screen('Flip', window);
         time_letter=rand(1)+0.5; %Speed with which the letters are presented = A randomized value between 0 and 1, + 0.5 sec
         WaitSecs(time_letter);
@@ -363,6 +373,7 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
       
       % Present white fixation cross for some seconds to show that
       % trial is over
+      duration=GetSecs-onset;
       %trig.beep(440, 0.2, 'rest');
       Screen('TextSize', window, 36);
       Screen('DrawLines', window, allCoords,...
@@ -375,8 +386,10 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
       DrawFormattedText(window, 'How many times was G presented? ','center','center', white);
       vbl = Screen('Flip', window);
       [secs, keyCode, deltaSecs]=KbWait;
-      letters_footautodual(j).reported_G=KbName(find(keyCode));
-      DrawFormattedText(window, ['Your answer: ' letters_footautodual(j).reported_G '\n Press any key to continue.'],'center','center', white);
+      % save the response and the key presses
+      response={KbName(find(keyCode))};
+      events_footautodual(j).stimuli=table(onset,duration, value, response);
+      DrawFormattedText(window, ['Your answer: ' response{1} '\n Press any key to continue.'],'center','center', white);
       vbl = Screen('Flip', window);
       KbStrokeWait; %wait for response to terminate instruction
       DrawFormattedText(window, 'Press any key to continue with the next trail. \n Note that you will first start with a fixation cross again. \n Start tapping the sequence as soon as a letter on the screen appears.' ,'center','center', white);
@@ -389,7 +402,7 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
     Screen('TextSize',window,25);
     DrawFormattedText(window, 'End of the automaticity test for the foot stomping task. \n You can take a rest if needed. \n When ready: press any key to end this session.','center','center', white);
     vbl = Screen('Flip', window);
-    save('letters_footautodual.mat', 'letters_footautodual'); % save the letters that were presented and the reported number of g's
+    save('events_footautodual.mat', 'events_footautodual'); % save the letters that were presented and the reported number of g's
     KbStrokeWait; %wait for response to terminate instructions
   end
 end
@@ -397,7 +410,7 @@ end
 %Show dual task performance in command window (finger tapping)
 fprintf('Finger AutoDual \n')
 for h = 1:N_trials
-     if str2num(letters_handautodual(h).reported_G)==sum(strcmp(letters_handautodual(h).presented, 'G'))
+     if str2num(events_handautodual(h).stimuli.response{1})==length(strfind(events_handautodual(h).stimuli.value{1}, 'G'))
       fprintf('T%d: G correct \n', h)
      else
       fprintf('T%d: G incorrect \n', h)
@@ -405,14 +418,14 @@ for h = 1:N_trials
       %Show if the tempo was correct. ! reflect if you want to show
       %this, because we cannot show this result for the foot stomping
       margin=0.25; % margin of error: think about what is most convenient
-      delay=mean(diff((presses_handautodual(h).secs))-1/1.50);
+      delay=mean(diff(events_handautodual(h).responses.onset)-1/1.50);
       fprintf('T%d: the tempo was off with on average %f seconds \n', h, delay);
-      if (all(abs(diff(presses_handautodual(h).secs)-1/1.5)<margin))
+      if (all(abs(diff(events_handautodual(h).responses.onset)-1/1.5)<margin))
         fprintf('T%d: tempo correct \n', h)
       else
         fprintf('T%d: tempo incorrect \n', h)  
       end
-      if strcmp(presses_handautodual(h).key,sequenceautoprint)
+      if all(strcmp(events_handautodual(h).responses.value,sequenceautoprint'))
           fprintf('T%d: seq correct \n', h)
       else
           fprintf('T%d: seq incorrect \n', h)
@@ -423,7 +436,7 @@ end
 %Show dual task performance in command window (foot stomping)
 fprintf('Foot AutoDual \n')
 for g = 1:N_trials
-      if str2num(letters_footautodual(g).reported_G)==sum(strcmp(letters_footautodual(g).presented, 'G'))
+     if str2num(events_footautodual(g).stimuli.response{1})==length(strfind(events_footautodual(g).stimuli.value{1}, 'G'))
         fprintf('T%d: G correct \n', g)
       else
         fprintf('T%d: G incorrect \n', g)
