@@ -118,6 +118,7 @@ if ~exist(sub_dir)
 end
 cd(sub_dir)
 
+logname=sprintf('%s_%s_triggers.log', sub, rec); diary(logname);
 % save current script in subject directory
 script=mfilename('fullpath');
 script_name=mfilename;
