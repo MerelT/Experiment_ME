@@ -58,11 +58,11 @@ KbQueueCreate; % option B
 KbQueueStart; % option B
 
 %Skip screen synchronization to prevent Pyshtoolbox for freezing
-Screen('Preference', 'SkipSyncTests', 1);
+%Screen('Preference', 'SkipSyncTests', 1);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %LOAD METRONOME SOUNDS (PsychToolbox)
-audio_dir='C:\Users\mtabo\Documents\TryOutScript\Experiment_ME\metronomesounds';
+audio_dir='C:\Users\Helena\Documents\Experiment_ME\metronomesounds';
 cd(audio_dir)
 [WAVMetronome8.wave,WAVMetronome8.fs]       = audioread('Metronome8.wav');
 
@@ -94,7 +94,7 @@ PsychPortAudio('FillBuffer', h_Metronome8, WAVMetronome8.wave);
 %SAVE FILES IN FOLDER
 
 fprintf('Select the project directory \n')
-root_dir=uigetdir('C:\Users\mtabo\Documents\TryOutScript\', 'Select the project directory');
+root_dir=uigetdir('C:\Users\Helena\Documents\pilots_ME\', 'Select the project directory');
 
 complete=0;
 while complete==0
@@ -141,7 +141,7 @@ t2 = 5;  %Random interval around the resting period time
 %Amount of letters presented during test for automaticity for one trial.
 %Should be adjusted when letter presenting speed is changed!
 N_letters=8; % 8 letters presented during a trial
-N_trials=11; % number of trials performed for each limb
+N_trials=2; % number of trials performed for each limb
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % RANDOMIZATION
@@ -265,7 +265,7 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
           %                     m=m+1;
           %                   end
           [ pressed, firstPress, ~, lastPress, ~]=KbQueueCheck; % option B
-          if pressed
+          if m<13 && pressed
             if isempty(find(firstPress~=lastPress)) % no key was pressed twice
               keys=KbName(find(firstPress)); % find the pressed keys
               [timing, idx]=sort(firstPress(find(firstPress))); % get timing of key presses in ascending order
@@ -273,11 +273,16 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
                 keys=keys(idx); % sort the pressed keys in ascending order
               else
                 keys={keys};
+               key_n=length(keys); % number of pressed keys
               end
-              key_n=length(keys); % number of pressed keys
-              keypresses.onset(m:m+key_n-1)=timing';
-              keypresses.value(m:m+key_n-1)=keys;
-              m=m+key_n;
+              for q=1:key_n
+                  keypresses.onset(m)=timing(q);
+                  keypresses.value(m)=keys(q);
+                  m=m+1;
+                  if m>12
+                      break
+                  end
+              end
             else
               error('key was pressed twice') % if this error occurs we need to find a way to handle this
             end
@@ -460,7 +465,7 @@ sca
 trig.pulseIR(3, 0.2); % stop trigger for the nirs recording
 delete(trig);
 ses.stop();
-dairy off;
+diary off;
 
 %% HELPER FUNCTIONS
 function triglistener(src, event)
