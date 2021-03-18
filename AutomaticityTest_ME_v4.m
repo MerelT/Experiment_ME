@@ -9,46 +9,46 @@ clear all
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % START ZMQ & LSL
 % raspberry names
-% zmq_proxy='lsldert00.local';
-% lsl_hosts={'lsldert00', 'lsldert04', 'lsldert05'};
-%
-% % add lsl streams
-% trigstr=cell(1);
-% nstr=0;
-% for ii=1:numel(lsl_hosts)
-%     host=lsl_hosts{ii};
-%     info_type=sprintf('type=''Digital Triggers @ %s''',host);
-%     info=lsl_resolver(info_type);
-%     desc=info.list();
-%     if isempty(desc)
-%         warning('lsl stream on host ''%s'' not found', host);
-%     else
-%         nstr=nstr+1;
-%         fprintf('%d: name: ''%s'' type: ''%s''\n',nstr,desc(1).name,desc(1).type);
-%         trigstr{nstr}=lsl_istream(info{1});
-%     end
-%     delete(info);
-% end
-% trig = lsldert_pubclient(zmq_proxy);
-% cleanupObj=onCleanup(@()cleanupFun);
-%
-% % create session
-% ses=lsl_session();
-% for ii=1:nstr
-%     ses.add_stream(trigstr{ii});
-% end
-%
-% % add listener
-% for ii=1:nstr
-%     addlistener(trigstr{ii}, 'DataAvailable', @triglistener);
-% end
+zmq_proxy='lsldert00.local';
+lsl_hosts={'lsldert00', 'lsldert04', 'lsldert05'};
+
+% add lsl streams
+trigstr=cell(1);
+nstr=0;
+for ii=1:numel(lsl_hosts)
+    host=lsl_hosts{ii};
+    info_type=sprintf('type=''Digital Triggers @ %s''',host);
+    info=lsl_resolver(info_type);
+    desc=info.list();
+    if isempty(desc)
+        warning('lsl stream on host ''%s'' not found', host);
+    else
+        nstr=nstr+1;
+        fprintf('%d: name: ''%s'' type: ''%s''\n',nstr,desc(1).name,desc(1).type);
+        trigstr{nstr}=lsl_istream(info{1});
+    end
+    delete(info);
+end
+trig = lsldert_pubclient(zmq_proxy);
+cleanupObj=onCleanup(@()cleanupFun);
+
+% create session
+ses=lsl_session();
+for ii=1:nstr
+    ses.add_stream(trigstr{ii});
+end
+
+% add listener
+for ii=1:nstr
+    addlistener(trigstr{ii}, 'DataAvailable', @triglistener);
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %INITIALISATION
 % start lsl session
-% ses.start();
-% trig.digitalout(0, 'TTL_init'); % ensures that the output is set to 0
-% trig.pulseIR(3, 0.2); % start trigger for the nirs recording
+ses.start();
+trig.digitalout(0, 'TTL_init'); % ensures that the output is set to 0
+trig.pulseIR(3, 0.2); % start trigger for the nirs recording
 
 %Open Phsychtoolbox.
 PsychDefaultSetup(2);
@@ -132,7 +132,7 @@ copyfile(sprintf('%s.m', script), fullfile(sub_dir, sprintf('%s_%s.m', sub, scri
 sequenceA = '4 3 4 1 4 1 2 4 3 2 1 2';
 sequenceB = '2 1 2 3 2 1 3 2 4 2 4 1';
 sequenceprintA = {'Return', '3', 'Return', '1' ,'Return' '1', '2','Return', '3','2','1','2'};
-sequenceprintB= {'2','1','2', '3','2','1','3', '2', 'return', '2', 'Return','1' };
+sequenceprintB= {'2','1','2', '3','2','1','3', '2', 'Return', '2', 'Return','1' };
 
 %Parameters for the resting period in between the trials
 t1 = 20; %Resting period in seconds
@@ -226,7 +226,7 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
       Letterlist='AGOL';
       letter_order=randi(length(Letterlist), 1, N_letters);
       value={Letterlist(letter_order)};
-      onset=GetSecs;
+      
 
       % Always start with a 20-25 seconds fixation cross with 8 seconds of metronome
       % sound
@@ -240,7 +240,8 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
 
       %Presentation of random letters on the screen during the finger
       %tapping test + recording of the key presses
-      %trig.beep(440, 0.2, 'finger_auto_dual');
+      trig.beep(440, 0.2, 'finger_auto_dual');
+      onset=GetSecs;
       % preallocate table with key presses
       keypresses=table('Size', [12, 3], 'VariableNames', {'onset', 'duration', 'value'}, 'VariableTypes', {'double', 'double', 'cell'});
       m=1; % first key press
@@ -293,7 +294,7 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
       % Present white fixation cross for some seconds to show that
       % trial is over
       duration=GetSecs-onset;
-      %trig.beep(440, 0.2, 'rest');
+      trig.beep(440, 0.2, 'rest');
       Screen('TextSize', window, 36);
       Screen('DrawLines', window, allCoords,...
         lineWidthPix, white, [xCenter yCenter], 2);
@@ -342,7 +343,7 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
       Letterlist= 'AGOL';
       letter_order=randi(length(Letterlist), 1, N_letters);
       value={Letterlist(letter_order)};
-      onset=GetSecs;
+      
 
       % Always start with a fixation cross and 8 seconds of metronome
       % sound
@@ -357,6 +358,7 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
       %Presentation of random letters on the screen during the foot
       %stomping test
       trig.beep(880, 0.2, 'foot_auto_dual');
+      onset=GetSecs;
       for n=1:N_letters
         % present random letter
         Screen('TextSize', window, 100);
@@ -375,7 +377,7 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
       % Present white fixation cross for some seconds to show that
       % trial is over
       duration=GetSecs-onset;
-      %trig.beep(440, 0.2, 'rest');
+      trig.beep(440, 0.2, 'rest');
       Screen('TextSize', window, 36);
       Screen('DrawLines', window, allCoords,...
         lineWidthPix, white, [xCenter yCenter], 2);
@@ -413,7 +415,7 @@ fprintf('Finger AutoDual \n')
 for h = 1:N_trials
      fprintf('Trial %d: \n', h)
      if str2num(events_handautodual(h).stimuli.response{1})==length(strfind(events_handautodual(h).stimuli.value{1}, 'G'))
-      fprintf('G correct \n', h)
+      fprintf('G correct \n')
      else
       fprintf('G incorrect \n')
      end
@@ -421,14 +423,14 @@ for h = 1:N_trials
       %this, because we cannot show this result for the foot stomping
       margin=0.25; % margin of error: think about what is most convenient
       delay=mean(diff(events_handautodual(h).responses.onset)-1/1.50);
-      fprintf('T%d: the tempo was off with on average %f seconds \n', h, delay);
-      if (all(abs(diff(events_handautodual(h).responses.onset)-1/1.5)<margin))
-        fprintf('T%d: tempo correct \n', h)
-      else
-        fprintf('T%d: tempo incorrect \n', h)
-      end
+      fprintf('the tempo was off with on average %f seconds \n', delay);
+%       if (all(abs(diff(events_handautodual(h).responses.onset)-1/1.5)<margin))
+%         fprintf('T%d: tempo correct \n', h)
+%       else
+%         fprintf('T%d: tempo incorrect \n', h)
+%       end
       if all(strcmp(events_handautodual(h).responses.value,sequenceautoprint'))
-          fprintf('Seq correct \n', h)
+          fprintf('Seq correct \n')
       else
           fprintf('Seq incorrect \n')
       end
@@ -440,7 +442,7 @@ fprintf('Foot AutoDual \n')
 for g = 1:N_trials
     fprintf('Trial %d: \n', g)
      if str2num(events_footautodual(g).stimuli.response{1})==length(strfind(events_footautodual(g).stimuli.value{1}, 'G'))
-        fprintf('G correct \n', g)
+        fprintf('G correct \n')
       else
         fprintf('G incorrect \n')
       end
@@ -455,10 +457,10 @@ KbStrokeWait; %wait for response to terminate instructions
 sca
 
 %% end the lsl session
-% trig.pulseIR(3, 0.2); % stop trigger for the nirs recording
-% delete(trig);
-% ses.stop();
-% dairy off;
+trig.pulseIR(3, 0.2); % stop trigger for the nirs recording
+delete(trig);
+ses.stop();
+dairy off;
 
 %% HELPER FUNCTIONS
 function triglistener(src, event)
