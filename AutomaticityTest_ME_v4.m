@@ -57,7 +57,7 @@ KbQueueCreate;
 KbQueueStart; 
 
 %Skip screen synchronization to prevent Pyshtoolbox for freezing
-%Screen('Preference', 'SkipSyncTests', 1);
+Screen('Preference', 'SkipSyncTests', 1);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %LOAD METRONOME SOUNDS (PsychToolbox)
@@ -221,7 +221,7 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
         %Instruction automaticity task finger tapping
         trig.beep(440, 0.2, 'instructions');
         Screen('TextSize',window,25);
-        DrawFormattedText(window, sprintf('You will now perform the pre-learned sequence for the FINGER tapping task: \n %s \n\n  While you perform the task, letters will be shown on the screen (A,G,O,L). \n The goal is to perform the sequence tapping while counting how many times G is presented. \n After each time you tapped the full sequence, you should tell us how many times G was presented. \n For answering this question, \n keep in mind that when the answer is 4 you press 4 and not Return (Enter) on the keyboard. \n\n We will perform 11 trails. \n Note that during the tapping task you cannot talk. \n Try to keep your body movements as still as possible exept for the right hand. \n Keep your eyes open (also during the rest periods). \n\n In between the trials you will see a fixation cross for 20 seconds. \n During the first few seconds you will hear a metronome sound. \n Tap the sequence on this rhythm, which is the same as you studied at home. \n\n We will start with a fixation cross on the screen for 20 seconds. \n After that the first trial will start automatically. \n So start tapping the sequence as soon as a letter on the screen appears. \n When ready: press any key to continue and start the test.', sequenceauto),'center','center', white);
+        DrawFormattedText(window, sprintf('You will now perform the pre-learned sequence for the FINGER tapping task: \n %s \n\n  While you perform the task, letters will be shown on the screen (A,G,O,L). \n In between each letter a red fixation cross will appear shortly. \n The goal is to perform the sequence tapping while counting how many times G is presented. \n After each time you tapped the full sequence, you should tell us how many times G was presented. \n For answering this question, \n keep in mind that when the answer is 4 you press 4 and not Return (Enter) on the keyboard. \n\n We will perform 11 trails. \n Note that during the tapping task you cannot talk. \n Try to keep your body movements as still as possible exept for the right hand. \n Keep your eyes open (also during the rest periods). \n\n In between the trials you will see a white fixation cross for 20 seconds. \n During the first few seconds you will hear a metronome sound. \n Tap the sequence on this rhythm, which is the same as you studied at home. \n\n We will start with a white fixation cross on the screen for 20 seconds. \n After that the first trial will start automatically. \n So start tapping the sequence as soon as a RED fixation cross appears on the screen. \n When ready: press any key to continue and start the test.', sequenceauto),'center','center', white);
         vbl = Screen('Flip', window);
         KbStrokeWait; %wait for response to terminate instructions
         
@@ -337,7 +337,7 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
         % Instruction automaticity task foot stomping
         trig.beep(440, 0.2, 'instructions');
         Screen('TextSize',window,25);
-        DrawFormattedText(window, sprintf('You will now perform the pre-learned sequence for the FOOT stomping task: \n %s \n\n While you perform the task, letters will be shown on the screen (A,G,O,L). \n The goal is to perform the sequence stomping while counting how many times G is presented. \n After each time you stomped the full sequence, you should tell us how many times G was presented. \n For answering this question, \n keep in mind that when the answer is 4 you press 4 and not Return (Enter) on the keyboard. \n\n We will perform 11 trials. \n Note that during the stomping task you cannot talk. \n Try to keep your body movements as still as possible exept for your right leg. \n Keep your eyes open (also during the rest periods). \n\n In between the trials you will see a fixation cross for 20 seconds. \n During the first few seconds you will hear a metronome sound. \n Stomp the sequence on this rhythm, which is the same as you studied at home. \n\n We will start with a fixation cross on the screen for 20 seconds. \n After that the first trial will start automatically. \n So start stomping the sequence as soon as a letter on the screen appears. \n When ready: press any key to continue and start the test.', sequenceauto),'center','center', white);
+        DrawFormattedText(window, sprintf('You will now perform the pre-learned sequence for the FOOT stomping task: \n %s \n\n While you perform the task, letters will be shown on the screen (A,G,O,L). \n In between each letter a red fixation cross will appear shortly. \n The goal is to perform the sequence stomping while counting how many times G is presented. \n After each time you stomped the full sequence, you should tell us how many times G was presented. \n For answering this question, \n keep in mind that when the answer is 4 you press 4 and not Return (Enter) on the keyboard. \n\n We will perform 11 trials. \n Note that during the stomping task you cannot talk. \n Try to keep your body movements as still as possible exept for your right leg. \n Keep your eyes open (also during the rest periods). \n\n In between the trials you will see a fixation cross for 20 seconds. \n During the first few seconds you will hear a metronome sound. \n Stomp the sequence on this rhythm, which is the same as you studied at home. \n\n We will start with a fixation cross on the screen for 20 seconds. \n After that the first trial will start automatically. \n So start stomping the sequence as soon as a RED fixation cross appears on the screen. \n When ready: press any key to continue and start the test.', sequenceauto),'center','center', white);
         vbl = Screen('Flip', window);
         KbStrokeWait; %wait for response to terminate instructions
         
@@ -366,17 +366,17 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
             onset=GetSecs;
             %Start loop for letter presenting during a trial
             for n=1:N_letters
-                %present random letter
-                Screen('TextSize', window, 100);
-                DrawFormattedText(window, value{1}(n),'center','center', white);
-                vbl = Screen('Flip', window);
-                time_letter=rand(1)+0.5; %Speed with which the letters are presented
-                WaitSecs(time_letter);
-                
-                %Between each letter show a red fixation cross
+                %Present a red fixation cross in between the letters
                 Screen('DrawLines', window, allCoords,...
                     lineWidthPix, [1 0 0], [xCenter yCenter], 2);
                 Screen('Flip', window);
+                time_letter=rand(1)+0.5; %Speed with which the letters are presented
+                WaitSecs(time_letter);
+                
+                %Present a random letter
+                Screen('TextSize', window, 100);
+                DrawFormattedText(window, value{1}(n),'center','center', white);
+                vbl = Screen('Flip', window);
                 WaitSecs (0.2);
             end
             
