@@ -253,17 +253,17 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
             KbQueueFlush; % clear all previous key presses from the list
             %Start loop for letter presenting during a trial
             for n=1:N_letters
-                %Present random letter on the screen
-                Screen('TextSize', window, 100);
-                DrawFormattedText(window, value{1}(n),'center','center', white);
+                %Between each letter show a red fixation cross
+                Screen('DrawLines', window, allCoords,...
+                  lineWidthPix, [1 0 0], [xCenter yCenter], 2);
                 vbl = Screen('Flip', window);
-                time_letter=rand(1)+0.5; %Speed with which the letters are presented
+                time_cross=rand(1)+0.5; %Speed with which the letters are presented
                 
                 %Meanwhile record key presses
                 start_timer=GetSecs;
-                while GetSecs-start_timer<time_letter
+                while GetSecs-start_timer<time_cross
                     [ pressed, firstPress, ~, lastPress, ~]=KbQueueCheck;
-                    if m<13 && pressed %not more than 12 keys can be saved
+                    if m<13 && GetSecs-start_timer<time_cross && pressed %not more than 12 keys can be saved
                         if isempty(find(firstPress~=lastPress)) % no key was pressed twice
                             keys=KbName(find(firstPress)); % find the pressed keys
                             [timing, idx]=sort(firstPress(find(firstPress))); % get timing of key presses in ascending order
@@ -287,9 +287,9 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
                     end
                 end
                 
-                %Between each letter show a red fixation cross
-                Screen('DrawLines', window, allCoords,...
-                    lineWidthPix, [1 0 0], [xCenter yCenter], 2);
+                %Present random letter on the screen
+                Screen('TextSize', window, 100);
+                DrawFormattedText(window, value{1}(n),'center','center', white);
                 Screen('Flip', window);
                 WaitSecs (0.2);
             end
