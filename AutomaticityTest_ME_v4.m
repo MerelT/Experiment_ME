@@ -9,46 +9,46 @@ clear all
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % START ZMQ & LSL
 % raspberry names
-zmq_proxy='lsldert00.local';
-lsl_hosts={'lsldert00', 'lsldert04', 'lsldert05'};
-
-% add lsl streams
-trigstr=cell(1);
-nstr=0;
-for ii=1:numel(lsl_hosts)
-    host=lsl_hosts{ii};
-    info_type=sprintf('type=''Digital Triggers @ %s''',host);
-    info=lsl_resolver(info_type);
-    desc=info.list();
-    if isempty(desc)
-        warning('lsl stream on host ''%s'' not found', host);
-    else
-        nstr=nstr+1;
-        fprintf('%d: name: ''%s'' type: ''%s''\n',nstr,desc(1).name,desc(1).type);
-        trigstr{nstr}=lsl_istream(info{1});
-    end
-    delete(info);
-end
-trig = lsldert_pubclient(zmq_proxy);
-cleanupObj=onCleanup(@()cleanupFun);
-
-% create session
-ses=lsl_session();
-for ii=1:nstr
-    ses.add_stream(trigstr{ii});
-end
-
-% add listener
-for ii=1:nstr
-    addlistener(trigstr{ii}, 'DataAvailable', @triglistener);
-end
+% zmq_proxy='lsldert00.local';
+% lsl_hosts={'lsldert00', 'lsldert04', 'lsldert05'};
+% 
+% % add lsl streams
+% trigstr=cell(1);
+% nstr=0;
+% for ii=1:numel(lsl_hosts)
+%     host=lsl_hosts{ii};
+%     info_type=sprintf('type=''Digital Triggers @ %s''',host);
+%     info=lsl_resolver(info_type);
+%     desc=info.list();
+%     if isempty(desc)
+%         warning('lsl stream on host ''%s'' not found', host);
+%     else
+%         nstr=nstr+1;
+%         fprintf('%d: name: ''%s'' type: ''%s''\n',nstr,desc(1).name,desc(1).type);
+%         trigstr{nstr}=lsl_istream(info{1});
+%     end
+%     delete(info);
+% end
+% trig = lsldert_pubclient(zmq_proxy);
+% cleanupObj=onCleanup(@()cleanupFun);
+% 
+% % create session
+% ses=lsl_session();
+% for ii=1:nstr
+%     ses.add_stream(trigstr{ii});
+% end
+% 
+% % add listener
+% for ii=1:nstr
+%     addlistener(trigstr{ii}, 'DataAvailable', @triglistener);
+% end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %INITIALISATION
 % start lsl session
-ses.start();
-trig.digitalout(0, 'TTL_init'); % ensures that the output is set to 0
-trig.pulseIR(3, 0.2); % start trigger for the nirs recording
+% ses.start();
+% trig.digitalout(0, 'TTL_init'); % ensures that the output is set to 0
+% trig.pulseIR(3, 0.2); % start trigger for the nirs recording
 
 %Open Phsychtoolbox.
 PsychDefaultSetup(2);
@@ -133,8 +133,8 @@ sequenceA = '4 3 4 1 4 1 2 4 3 2 1 2';
 sequenceB = '2 1 2 3 2 1 3 2 4 2 4 1';
 %Sequences used in order to be able to print in the command window if
 %sequences performed by the participant were right (see also end of script)
-sequenceprintA = {'Return', '3', 'Return', '1' ,'Return' '1', '2','Return', '3','2','1','2'};
-sequenceprintB = {'2','1','2', '3','2','1','3', '2', 'Return', '2', 'Return','1' };
+sequenceprintA = {'BackSpace','6','BackSpace','4','BackSpace','4','5','BackSpace','6','5','4','5'};
+sequenceprintB = {'5','4','5','6','5','4','6','5','BackSpace','5','BackSpace','4'};
 
 %Parameters for the resting period in between the trials
 t1 = 20; %Resting period in seconds
@@ -143,7 +143,7 @@ t2 = 5;  %Random interval around the resting period time
 %Amount of letters presented during test for automaticity for one trial.
 %Should be adjusted when letter presenting speed is changed!
 N_letters=8; % 8 letters presented during a trial
-N_trials=11; % number of trials performed for each limb
+N_trials=2; % number of trials performed for each limb
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % RANDOMIZATION
@@ -212,21 +212,21 @@ vbl = Screen('Flip', window);
 KbStrokeWait; %wait for response to terminate instructions
 
 %Start the randomization loop
-for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
+for i=order_autodual; %Either [1,2] or [2,1] -> determines the order of the tasks
     
     % Finger tapping test -> 11 trials, dual task, in which a participant
     % taps a prelearned sequence, while also letters are presented on the
     % screen in a randomized speed
-    if i==1
+    if i==1;
         %Instruction automaticity task finger tapping
-        trig.beep(440, 0.2, 'instructions');
+        %trig.beep(440, 0.2, 'instructions');
         Screen('TextSize',window,25);
-        DrawFormattedText(window, sprintf('You will now perform the pre-learned sequence for the FINGER tapping task: \n %s \n\n  While you perform the task, letters will be shown on the screen (A,G,O,L). \n In between each letter a red fixation cross will appear shortly. \n The goal is to perform the sequence tapping while counting how many times G is presented. \n After each time you tapped the full sequence, you should tell us how many times G was presented. \n For answering this question, \n keep in mind that when the answer is 4 you press 4 and not Return (Enter) on the keyboard. \n\n We will perform 11 trails. \n Note that during the tapping task you cannot talk. \n Try to keep your body movements as still as possible exept for the right hand. \n Keep your eyes open (also during the rest periods). \n\n In between the trials you will see a white fixation cross for 20 seconds. \n During the first few seconds you will hear a metronome sound. \n Tap the sequence on this rhythm, which is the same as you studied at home. \n\n We will start with a white fixation cross on the screen for 20 seconds. \n After that the first trial will start automatically. \n So start tapping the sequence as soon as a RED fixation cross appears on the screen. \n When ready: press any key to continue and start the test.', sequenceauto),'center','center', white);
+        DrawFormattedText(window, sprintf('You will now perform the pre-learned sequence for the FINGER tapping task: \n %s \n\n  While you perform the task, letters will be shown on the screen (A,G,O,L). \n In between each letter a red fixation cross will appear shortly. \n The goal is to perform the sequence tapping while counting how many times G is presented. \n After each time you tapped the full sequence, you should tell us how many times G was presented. \n For answering this question, keep in mind that \n you press the right key on your keyboard according to your answer (not the number of the sequence!). \n\n We will perform 11 trails. \n For each trial you perform the sequence once. \n Note that during the tapping task you cannot talk. \n Try to keep your body movements as still as possible exept for the right hand. \n Keep your eyes open (also during the rest periods). \n\n In between the trials you will see a white fixation cross for 20 seconds. \n During the first few seconds you will hear a metronome sound. \n Tap the sequence on this rhythm, which is the same as you studied at home. \n\n We will start with a white fixation cross on the screen for 20 seconds. \n After that the first trial will start automatically. \n So start tapping the sequence as soon as a RED fixation cross appears on the screen. \n When ready: press any key to continue and start the test.', sequenceauto),'center','center', white);
         vbl = Screen('Flip', window);
         KbStrokeWait; %wait for response to terminate instructions
         
         %Start loop for the trials
-        for j=1:N_trials
+        for j=1:N_trials;
             %Presentation of the letters on the screen (dual task). -> is random.
             %Participant has to count the amount that G was presented.
             Letterlist='AGOL';
@@ -235,24 +235,24 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
             
             %Always start with a 20-25 seconds fixation cross with 8 seconds of metronome
             %sound
-            trig.beep(440, 0.2, 'rest');
+            %trig.beep(440, 0.2, 'rest');
             Screen('TextSize', window, 36);
             Screen('DrawLines', window, allCoords,...
                 lineWidthPix, white, [xCenter yCenter], 2);
             Screen('Flip', window);
             PsychPortAudio('Start', h_Metronome8, 1, [], []); % Play metronome sound file (8 seconds)
-            WaitSecs(t1+randi(t2))
+            WaitSecs(t1+randi(t2));
             
             %Presentation of random letters on the screen during the finger
             %tapping test + recording of the key presses
-            trig.beep(440, 0.2, 'finger_auto_dual');
+            %trig.beep(440, 0.2, 'finger_auto_dual');
             onset=GetSecs;
             %preallocate table with key presses
             keypresses=table('Size', [12, 3], 'VariableNames', {'onset', 'duration', 'value'}, 'VariableTypes', {'double', 'double', 'cell'});
             m=1; %first key press
             KbQueueFlush; % clear all previous key presses from the list
             %Start loop for letter presenting during a trial
-            for n=1:N_letters
+            for n=1:N_letters;
                 %Between each letter show a red fixation cross
                 Screen('DrawLines', window, allCoords,...
                   lineWidthPix, [1 0 0], [xCenter yCenter], 2);
@@ -297,7 +297,7 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
             %Present white fixation cross for some seconds to show that
             %trial is over
             duration=GetSecs-onset;
-            trig.beep(440, 0.2, 'rest');
+            %trig.beep(440, 0.2, 'rest');
             Screen('TextSize', window, 36);
             Screen('DrawLines', window, allCoords,...
                 lineWidthPix, white, [xCenter yCenter], 2);
@@ -316,7 +316,7 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
             DrawFormattedText(window, ['Your answer: ' response{1} '\n Press any key to continue.'],'center','center', white);
             vbl = Screen('Flip', window);
             KbStrokeWait;
-            DrawFormattedText(window, 'Press any key to continue with the next trail. \n Note that you will first start with a fixation cross again. \n Start tapping the sequence as soon as a letter on the screen appears.' ,'center','center', white);
+            DrawFormattedText(window, 'Press any key to continue with the next trail. \n Note that you will first start with a fixation cross again. \n Start tapping the sequence as soon as a RED fixation cross appears on the screen.' ,'center','center', white);
             vbl = Screen('Flip', window);
             KbStrokeWait;
         end
@@ -333,17 +333,17 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
         % Foot stomping test -> 11 trials, dual task, in which a participant
         % stomps a prelearned sequence, while also letters are presented on the
         % screen in a randomized speed
-    elseif i==2
+    elseif i==2;
         % Instruction automaticity task foot stomping
-        trig.beep(440, 0.2, 'instructions');
+        %trig.beep(440, 0.2, 'instructions');
         Screen('TextSize',window,25);
-        DrawFormattedText(window, sprintf('You will now perform the pre-learned sequence for the FOOT stomping task: \n %s \n\n While you perform the task, letters will be shown on the screen (A,G,O,L). \n In between each letter a red fixation cross will appear shortly. \n The goal is to perform the sequence stomping while counting how many times G is presented. \n After each time you stomped the full sequence, you should tell us how many times G was presented. \n For answering this question, \n keep in mind that when the answer is 4 you press 4 and not Return (Enter) on the keyboard. \n\n We will perform 11 trials. \n Note that during the stomping task you cannot talk. \n Try to keep your body movements as still as possible exept for your right leg. \n Keep your eyes open (also during the rest periods). \n\n In between the trials you will see a fixation cross for 20 seconds. \n During the first few seconds you will hear a metronome sound. \n Stomp the sequence on this rhythm, which is the same as you studied at home. \n\n We will start with a fixation cross on the screen for 20 seconds. \n After that the first trial will start automatically. \n So start stomping the sequence as soon as a RED fixation cross appears on the screen. \n When ready: press any key to continue and start the test.', sequenceauto),'center','center', white);
+        DrawFormattedText(window, sprintf('You will now perform the pre-learned sequence for the FOOT stomping task: \n %s \n\n While you perform the task, letters will be shown on the screen (A,G,O,L). \n In between each letter a red fixation cross will appear shortly. \n The goal is to perform the sequence stomping while counting how many times G is presented. \n After each time you stomped the full sequence, you should tell us how many times G was presented. \n For answering this question, keep in mind that \n you press the right key on your keyboard according to your answer (not the number of the sequence!). \n\n We will perform 11 trials. \n For each trial you perform the sequence once. \n Note that during the stomping task you cannot talk. \n Try to keep your body movements as still as possible exept for your right leg. \n Keep your eyes open (also during the rest periods). \n\n In between the trials you will see a fixation cross for 20 seconds. \n During the first few seconds you will hear a metronome sound. \n Stomp the sequence on this rhythm, which is the same as you studied at home. \n\n We will start with a fixation cross on the screen for 20 seconds. \n After that the first trial will start automatically. \n So start stomping the sequence as soon as a RED fixation cross appears on the screen. \n When ready: press any key to continue and start the test.', sequenceauto),'center','center', white);
         vbl = Screen('Flip', window);
         KbStrokeWait; %wait for response to terminate instructions
         
-        trig.digitalout(1, 'start_rec'); % starts the recording of xsens
+        %trig.digitalout(1, 'start_rec'); % starts the recording of xsens
         %Start loop for the trials
-        for j=1:N_trials
+        for j=1:N_trials;
             %Presentation of the letters on the screen (dual task). -> is random.
             %Participant has to count the amount that G was presented.
             Letterlist= 'AGOL';
@@ -352,20 +352,20 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
             
             %Always start with a 20-25 seconds fixation cross with 8 seconds of metronome
             %sound
-            trig.beep(440, 0.2, 'rest');
+            %trig.beep(440, 0.2, 'rest');
             Screen('TextSize', window, 36);
             Screen('DrawLines', window, allCoords,...
                 lineWidthPix, white, [xCenter yCenter], 2);
             Screen('Flip', window);
             PsychPortAudio('Start', h_Metronome8, 1, [], []); % Play metronome sound file (8 seconds)
-            WaitSecs(t1+randi(t2))
+            WaitSecs(t1+randi(t2));
             
             %Presentation of random letters on the screen during the foot
             %stomping test
-            trig.beep(880, 0.2, 'foot_auto_dual');
+            %trig.beep(880, 0.2, 'foot_auto_dual');
             onset=GetSecs;
             %Start loop for letter presenting during a trial
-            for n=1:N_letters
+            for n=1:N_letters;
                 %Present a red fixation cross in between the letters
                 Screen('DrawLines', window, allCoords,...
                     lineWidthPix, [1 0 0], [xCenter yCenter], 2);
@@ -383,7 +383,7 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
             % Present white fixation cross for some seconds to show that
             % trial is over
             duration=GetSecs-onset;
-            trig.beep(440, 0.2, 'rest');
+            %trig.beep(440, 0.2, 'rest');
             Screen('TextSize', window, 36);
             Screen('DrawLines', window, allCoords,...
                 lineWidthPix, white, [xCenter yCenter], 2);
@@ -401,13 +401,13 @@ for i=order_autodual %Either [1,2] or [2,1] -> determines the order of the tasks
             DrawFormattedText(window, ['Your answer: ' response{1} '\n Press any key to continue.'],'center','center', white);
             vbl = Screen('Flip', window);
             KbStrokeWait; %wait for response to terminate instruction
-            DrawFormattedText(window, 'Press any key to continue with the next trail. \n Note that you will first start with a fixation cross again. \n Start tapping the sequence as soon as a letter on the screen appears.' ,'center','center', white);
+            DrawFormattedText(window, 'Press any key to continue with the next trail. \n Note that you will first start with a fixation cross again. \n Start tapping the sequence as soon as a RED fixation cross appears on the screen.' ,'center','center', white);
             vbl = Screen('Flip', window);
             KbStrokeWait;
         end
         
         % After all trials completed, the end of the foot stomping task is reached.
-        trig.digitalout(0, 'stop_rec'); % stops the recording of xsens
+        %trig.digitalout(0, 'stop_rec'); % stops the recording of xsens
         Screen('TextSize',window,25);
         DrawFormattedText(window, 'End of the automaticity test for the foot stomping task. \n You can take a rest if needed. \n When ready: press any key to end this session.','center','center', white);
         vbl = Screen('Flip', window);
@@ -460,22 +460,22 @@ KbStrokeWait;
 sca
 
 %% end the lsl session
-trig.pulseIR(3, 0.2); % stop trigger for the nirs recording
-delete(trig);
-ses.stop();
-diary off;
+% trig.pulseIR(3, 0.2); % stop trigger for the nirs recording
+% delete(trig);
+% ses.stop();
+% diary off;
 
 %% HELPER FUNCTIONS
-function triglistener(src, event)
-for ii=1:numel(event.Data)
-  info=src.info;
-  fprintf('   lsl event (%s) received @ %s with (uncorrected) timestamp %.3f \n',  event.Data{ii}, info.type, event.Timestamps(ii));
-end
-end
-
-function cleanupFun()
-delete(ses);
-delete(trigstr{1});
-delete(trigstr{2});
-delete(info);
-end
+% function triglistener(src, event)
+% for ii=1:numel(event.Data)
+%   info=src.info;
+%   fprintf('   lsl event (%s) received @ %s with (uncorrected) timestamp %.3f \n',  event.Data{ii}, info.type, event.Timestamps(ii));
+% end
+% end
+% 
+% function cleanupFun()
+% delete(ses);
+% delete(trigstr{1});
+% delete(trigstr{2});
+% delete(info);
+% end
