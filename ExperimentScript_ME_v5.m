@@ -16,7 +16,7 @@ clear all
 zmq_proxy='lsldert00.local';
 lsl_hosts={'lsldert00', 'lsldert04', 'lsldert05'};
 
-add lsl streams
+%add lsl streams
 trigstr=cell(1);
 nstr=0;
 for ii=1:numel(lsl_hosts)
@@ -83,7 +83,7 @@ sequenceprintB = {'5','4','5','6','5','4','6','5','BackSpace','5','BackSpace','4
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %LOAD METRONOME SOUNDS (PsychToolbox)
-audio_dir='C:\Users\mtabo\Documents\TryOutScript\Experiment_ME\metronomesounds';
+audio_dir='C:\Users\Helena\Documents\Experiment_ME\metronomesounds';
 cd(audio_dir)
 [WAVMetronome8.wave,WAVMetronome8.fs]       = audioread('Metronome8.wav');
 [WAVMetronome600.wave,WAVMetronome600.fs]       = audioread('Metronome600.wav');
@@ -123,7 +123,7 @@ PsychPortAudio('FillBuffer', h_Metronome300, WAVMetronome300.wave);
 %SAVE FILES IN FOLDER
 
 fprintf('Select the project directory \n')
-root_dir=uigetdir('C:\Users\mtabo\Documents\TryOutScript\', 'Select the project directory');
+root_dir=uigetdir('C:\Users\Helena\Documents\Data_ME\', 'Select the project directory');
 
 complete=0;
 while complete==0
@@ -167,7 +167,7 @@ sequencenonautoprint = sequenceprintA;
 %The order of the experiment is randomized for each participant
 %Create a vector to represent the two different options (1=non-automatic
 %test, 2=automatic test).
-order_experiment=[1,2];
+order_experiment=[2,1];
 %Save the order of the experiment
 save('order_experiment.mat', 'order_experiment');
 
@@ -506,7 +506,7 @@ for i=order_experiment; %Either [1,2] or [2,1] -> determines the order of the ta
                 for n = 1:N_trials; %Will perform 11 trials
                     
                     % Rest period 20-25 seconds, show white fixation cross
-                    %trig.beep(440, 0.2, 'rest');
+                    trig.beep(440, 0.2, 'rest');
                     Screen('TextSize', window, 36);
                     Screen('DrawLines', window, allCoords,...
                         lineWidthPix, white, [xCenter yCenter], 2);
@@ -520,7 +520,7 @@ for i=order_experiment; %Either [1,2] or [2,1] -> determines the order of the ta
                     Screen('TextSize', window, 36);
                     Screen('DrawLines', window, allCoords,...
                         lineWidthPix, [1 0 0], [xCenter yCenter], 2);
-                    Screen('Flip', window)
+                    Screen('Flip', window);
                     WaitSecs(t3);
                     
                     % Short white fix cross after trial
@@ -551,7 +551,7 @@ for i=order_experiment; %Either [1,2] or [2,1] -> determines the order of the ta
                 vbl= Screen('Flip', window);
                 save('events_footnonauto.mat', 'events_footnonauto'); % save the events
                 KbStrokeWait; %wait for response to terminate instructions
-                %trig.digitalout(0, 'stop_rec'); % stops the recording of xsens
+                trig.digitalout(0, 'stop_rec'); % stops the recording of xsens
                 
                 
                 % DUAL TASK NON AUTOMATIC FOOT STOMPING TASK
@@ -768,7 +768,7 @@ for i=order_experiment; %Either [1,2] or [2,1] -> determines the order of the ta
                     
                     % Show short white fix cross after trial
                     trig.beep(440, 0.2, 'rest');
-                    duration=GetSecs-onset
+                    duration=GetSecs-onset;
                     Screen('TextSize', window, 36);
                     Screen('DrawLines', window, allCoords,...
                         lineWidthPix, white, [xCenter yCenter], 2);
